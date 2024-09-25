@@ -1,0 +1,46 @@
+\documentclass[fontsize=12pt, paper=book, DIV=calc]{scrbook}
+
+% PACKAGES
+\usepackage[top=35mm, bottom=70mm, inner=20mm, outer=30mm]{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx, tabularx}
+\usepackage{physics, mathtools}
+\usepackage{amssymb, enumitem}
+\usepackage[colorlinks=true, linkcolor=myblue]{hyperref}
+\usepackage{caption, subcaption,  xcolor}
+\usepackage{cleveref}
+\usepackage{biblatex}
+
+\definecolor{myblue}{RGB}{0,82,155}
+% Formatting settings
+\KOMAoptions{headsepline=true}
+\setlength{\headsep}{1.5em} % Increase space between header and body
+\usepackage{scrlayer-scrpage} % Ensure scrlayer-scrpage is loaded for customization
+\addtokomafont{headsepline}{\color{myblue}} % Set headsepline color to blue
+\setkomafont{disposition}{\color{myblue}\bfseries}
+\setlength{\parskip}{1em}
+\renewcommand{\headfont}{\color{myblue}\normalfont\slshape}
+
+
+\hypersetup{colorlinks=true, linkcolor=myblue, citecolor=myblue, urlcolor=myblue}
+
+\addbibresource{references.bib}  % Your bibliography file
+
+\title{OCR Project Report}
+\author{Fausto Frisenna}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+Optical recognition is a field that consists of extracting the text out of an image in order for it to be manipulated by a computer. Even though paper material is a natural way of communication for humans, it is not understandable by a computer. For this reason, a lot of insurance companies focus on this type of tool in order to OCR (Optical Character Recognition) process handwritten documents (birth certificates, sale certificates)
+The goal of this project is to use a Deep Learning algorithm (Computer Vision) to recognize the characters within PDF/PNG files.
+\input{Reports/first_report.tex}
+\printbibliography
+
+\end{document}
