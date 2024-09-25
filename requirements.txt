@@ -1,0 +1,21 @@
+# Data Manipulation  
+numpy  
+pandas  
+
+# Data Visualization  
+matplotlib  
+seaborn  
+plotly  
+
+# Machine Learning  
+scikit-learn  
+tensorflow   # For deep learning  
+keras        # High-level neural networks API  
+#xgboost==1.4.1      # Gradient boosting framework  
+#lightgbm==3.2.1     # LightGBM framework  
+#catboost==1.0.6     # CatBoost framework for categorical data  
+statsmodels  # Statistical modeling  
+
+# Miscellaneous  
+jupyter      # Jupyter Notebook for interactive computing  
+notebook     # Jupyter Notebook package  
