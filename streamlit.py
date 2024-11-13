@@ -12,11 +12,17 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import itertools
+import seaborn as sns
 
 from PIL import Image
 
 from nltk.corpus import stopwords
 import nltk
+
+import tensorflow as tf
+import streamlit as st
+from sklearn.metrics import confusion_matrix
+
 
 # Streamlit title
 st.title("Handwritten Recognition using Deep Learning and OCR Approach")
@@ -72,7 +78,7 @@ st.sidebar.title("Table of contents")
 pages = ["Exploration", "Data Visualization", "Modeling"]
 page = st.sidebar.radio("Go to", pages)
 
-# Display content based on the selected page
+# Page1: Display content based on the selected page
 if page == pages[0]:
     st.write("### Presentation of Data")
     st.dataframe(df.head(10))
@@ -89,7 +95,7 @@ if page == pages[0]:
     st.write("### Random Data Sample")
     st.dataframe(df.sample(10))
 
-# Page 1: Data Visualization
+# Page 2: Data Visualization
 if page == pages[1]:
     st.title("Data Visualization")
 
@@ -238,3 +244,183 @@ if page == pages[1]:
         col_index = index % 3
         with cols[col_index]:
             st.image(image, caption=f"Transcription: {row['transcription']}", use_container_width=True)
+
+# Page 3: Modeling
+
+if page == pages[2]:
+    path_to_checkpoints = "../models_check_points/"
+    st.subheader('Summary of Simple CNN model on filtered data')
+    model = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
+    # Capture model summary in a string buffer
+    summary_str = io.StringIO()
+    model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
+    st.text(summary_str.getvalue())
+
+    st.subheader("Simple CNN model - Accuracy Over Epochs")
+    # Load the history data
+    df_history = pd.read_csv(path_to_checkpoints+'CNN_training_history.csv')
+    # Create an accuracy plot
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+    fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+    fig.update_layout(
+    xaxis_title='Epoch',
+    yaxis_title='Accuracy',
+    legend_title='Legend',
+    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                        )
+
+    st.plotly_chart(fig)
+    original_labels = ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']
+
+    # Simple CNN model - Confusion Matrix
+    st.subheader("Simple CNN model - Confusion Matrix")
+    
+    # Load the model
+    model = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
+    
+    # Make predictions
+    # Load X_test and y_test from CSV files
+    df_X_test = pd.read_csv(path_to_checkpoints+'CNN_X_test.csv')
+    df_y_test = pd.read_csv(path_to_checkpoints+'CNN_y_test.csv')
+
+    # Convert back to NumPy arrays if needed
+    X_test = df_X_test.values.reshape(-1, 28, 28, 1)  # Adjust shape as necessary
+    y_test = df_y_test['label'].values
+
+    y_pred = model.predict(X_test)
+    y_pred_class = np.argmax(y_pred, axis=1)
+    
+    # Create the confusion matrix
+    cm = confusion_matrix(y_test, y_pred_class)
+    
+    # Plot the confusion matrix using seaborn
+    fig, ax = plt.subplots()
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
+
+    ax.set_xlabel('Predicted')
+    ax.set_ylabel('True')
+    
+    st.pyplot(fig)
+
+    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+
+    with tab1:
+        st.subheader('Summary VGG16 Frozen Model')
+        model = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224.h5')
+        # Capture model summary in a string buffer
+        summary_str = io.StringIO()
+        model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
+        st.text(summary_str.getvalue())
+
+
+
+    with tab2:
+        st.subheader('Summary VGG16 Unfrozen Model')
+        model = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224_unfreez_last_4.h5')
+        # Capture model summary in a string buffer
+        summary_str = io.StringIO()
+        model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
+        st.text(summary_str.getvalue())
+
+
+    
+    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+
+    with tab1:
+        st.subheader("VGG16 Frozen Model - Accuracy Over Epochs")
+        # Load the history data
+        df_history = pd.read_csv(path_to_checkpoints+'vgg16_training_history.csv')
+        # Create an accuracy plot
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+        fig.update_layout(
+            xaxis_title='Epoch',
+            yaxis_title='Accuracy',
+            legend_title='Legend',
+            yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                        )
+
+        st.plotly_chart(fig)
+
+    with tab2:
+        st.subheader("VGG16 UnFrozen Model - Accuracy Over Epochs")
+        # Load the history data
+        df_history = pd.read_csv(path_to_checkpoints+'vgg16_unfreez_training_history.csv')
+        # Create an accuracy plot
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+        fig.update_layout(
+            xaxis_title='Epoch',
+            yaxis_title='Accuracy',
+            legend_title='Legend',
+            yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                        )
+
+        st.plotly_chart(fig)
+
+    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+
+    with tab1:
+        # VGG16 Frozen Model - Confusion Matrix
+        st.subheader("VGG16 Frozen Model - Confusion Matrix")
+        
+        # Load the model
+        model2 = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224.h5')
+        
+        # Make predictions
+        # Load X_test and y_test from CSV files
+        df_X_test = pd.read_csv(path_to_checkpoints+'VGG16_X_test.csv')
+        df_y_test = pd.read_csv(path_to_checkpoints+'VGG16_y_test.csv')
+
+        # Convert back to NumPy arrays if needed
+        X_test = df_X_test.values.reshape(-1, 224, 224, 3)  # Adjust shape as necessary
+        y_test = df_y_test['label'].values
+
+        y_pred = model2.predict(X_test)
+        y_pred_class = np.argmax(y_pred, axis=1)
+        
+        # Create the confusion matrix
+        cm = confusion_matrix(y_test, y_pred_class)
+        
+        # Plot the confusion matrix using seaborn
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
+
+        ax.set_xlabel('Predicted')
+        ax.set_ylabel('True')
+        
+        st.pyplot(fig)
+
+    with tab2:
+        # VGG16 Unfrozen Model - Confusion Matrix
+        st.subheader("VGG16 Unfrozen Model - Confusion Matrix")
+        
+        # Load the model
+        model3 = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224_unfreez_last_4.h5')
+        
+        # Make predictions
+        # Load X_test and y_test from CSV files
+        df_X_test = pd.read_csv(path_to_checkpoints+'VGG16_Unfreez_X_test.csv')
+        df_y_test = pd.read_csv(path_to_checkpoints+'VGG16_Unfreez_y_test.csv')
+
+        # Convert back to NumPy arrays if needed
+        X_test = df_X_test.values.reshape(-1, 224, 224, 3)  # Adjust shape as necessary
+        y_test = df_y_test['label'].values
+
+        y_pred = model3.predict(X_test)
+        y_pred_class = np.argmax(y_pred, axis=1)
+        
+        # Create the confusion matrix
+        cm = confusion_matrix(y_test, y_pred_class)
+        
+        # Plot the confusion matrix using seaborn
+        fig, ax = plt.subplots()
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
+
+        ax.set_xlabel('Predicted')
+        ax.set_ylabel('True')
+        
+        st.pyplot(fig)
