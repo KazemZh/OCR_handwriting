@@ -325,182 +325,78 @@ if page == pages[2]:
 
 # Page 3: Modeling
 if page == pages[3]:
-    st.subheader('Summary of Simple CNN model on filtered data')
-    model = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
-    # Capture model summary in a string buffer
-    summary_str = io.StringIO()
-    model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
-    st.text(summary_str.getvalue())
+    tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
-    st.subheader("Simple CNN model - Accuracy Over Epochs")
-    # Load the history data
-    df_history = pd.read_csv(path_to_checkpoints+'CNN_training_history.csv')
-    # Create an accuracy plot
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-    fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-    fig.update_layout(
-    xaxis_title='Epoch',
-    yaxis_title='Accuracy',
-    legend_title='Legend',
-    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-                        )
+    # Define a helper function to display content based on button clicks
+    def display_model_info(model_name, model_path, history_file, conf_matrix_img):
+        st.header(f"{model_name} on Filtered Data")
 
-    st.plotly_chart(fig)
+        # Adding buttons side by side using columns
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            show_summary = st.button("Show Model Summary", key=f"{model_name}_summary")
+        with col2:
+            show_accuracy = st.button("Show Accuracy Over Epochs", key=f"{model_name}_accuracy")
+        with col3:
+            show_confusion_matrix = st.button("Show Confusion Matrix", key=f"{model_name}_conf_matrix")
 
-    original_labels = ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']
+        # Display sections based on button clicks
+        if show_summary:
+            st.subheader("Model Summary")
+            model = tf.keras.models.load_model(model_path)
+            # Capture model summary in a string buffer
+            summary_str = io.StringIO()
+            model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
+            st.text(summary_str.getvalue())
 
-    # Simple CNN model - Confusion Matrix
-    st.subheader("Simple CNN model - Confusion Matrix")
-    
-    # Load the model
-    model = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
-    
-    # Make predictions
-    # Load X_test and y_test from CSV files
-    df_X_test = pd.read_csv(path_to_checkpoints+'CNN_X_test.csv')
-    df_y_test = pd.read_csv(path_to_checkpoints+'CNN_y_test.csv')
+        if show_accuracy:
+            st.subheader("Accuracy Over Epochs")
+            # Load the history data
+            df_history = pd.read_csv(history_file)
+            # Create an accuracy plot
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+            fig.update_layout(
+                xaxis_title='Epoch',
+                yaxis_title='Accuracy',
+                legend_title='Legend',
+                width=700,
+                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+            )
+            st.plotly_chart(fig)
 
-    # Convert back to NumPy arrays if needed
-    X_test = df_X_test.values.reshape(-1, 28, 28, 1)  # Adjust shape as necessary
-    y_test = df_y_test['label'].values
+        if show_confusion_matrix:
+            st.subheader("Confusion Matrix")
+            st.image(conf_matrix_img, width=700)
 
-    y_pred = model.predict(X_test)
-    y_pred_class = np.argmax(y_pred, axis=1)
-    
-    # Create the confusion matrix
-    cm = confusion_matrix(y_test, y_pred_class)
-    
-    # Plot the confusion matrix using seaborn
-    fig, ax = plt.subplots()
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
-
-    ax.set_xlabel('Predicted')
-    ax.set_ylabel('True')
-    
-    st.pyplot(fig)
-
-    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
-
+    # Simple CNN Model Tab
     with tab1:
-        st.subheader('Summary VGG16 Frozen Model')
-        model = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224.h5')
-        # Capture model summary in a string buffer
-        summary_str = io.StringIO()
-        model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
-        st.text(summary_str.getvalue())
+        display_model_info(
+            model_name="Simple CNN Model",
+            model_path=path_to_checkpoints + 'CNN.h5',
+            history_file=path_to_checkpoints + 'CNN_training_history.csv',
+            conf_matrix_img=path_to_checkpoints + 'cnn_model_conf_matrix.png'
+        )
 
-
-
+    # VGG16 Frozen Model Tab
     with tab2:
-        st.subheader('Summary VGG16 Unfrozen Model')
-        model = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224_unfreez_last_4.h5')
-        # Capture model summary in a string buffer
-        summary_str = io.StringIO()
-        model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
-        st.text(summary_str.getvalue())
+        display_model_info(
+            model_name="VGG16 Frozen Model",
+            model_path=path_to_checkpoints + 'vgg16_224.h5',
+            history_file=path_to_checkpoints + 'vgg16_training_history.csv',
+            conf_matrix_img=path_to_checkpoints + 'vgg16_model_conf_matrix.png'
+        )
 
-
+    # VGG16 Unfrozen Model Tab
+    with tab3:
+        display_model_info(
+            model_name="VGG16 Unfrozen Model",
+            model_path=path_to_checkpoints + 'vgg16_224_unfreez_last_4.h5',
+            history_file=path_to_checkpoints + 'vgg16_unfreez_training_history.csv',
+            conf_matrix_img=path_to_checkpoints + 'vgg16_unfreez_model_conf_matrix.png'
+        )
     
-    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
-
-    with tab1:
-        st.subheader("VGG16 Frozen Model - Accuracy Over Epochs")
-        # Load the history data
-        df_history = pd.read_csv(path_to_checkpoints+'vgg16_training_history.csv')
-        # Create an accuracy plot
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-        fig.update_layout(
-            xaxis_title='Epoch',
-            yaxis_title='Accuracy',
-            legend_title='Legend',
-            yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-                        )
-
-        st.plotly_chart(fig)
-
-    with tab2:
-        st.subheader("VGG16 UnFrozen Model - Accuracy Over Epochs")
-        # Load the history data
-        df_history = pd.read_csv(path_to_checkpoints+'vgg16_unfreez_training_history.csv')
-        # Create an accuracy plot
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-        fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-        fig.update_layout(
-            xaxis_title='Epoch',
-            yaxis_title='Accuracy',
-            legend_title='Legend',
-            yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-                        )
-
-        st.plotly_chart(fig)
-
-    tab1, tab2 = st.tabs(["VGG16 Frozen Model", "VGG16 Unfrozen Model"])
-
-    with tab1:
-        # VGG16 Frozen Model - Confusion Matrix
-        st.subheader("VGG16 Frozen Model - Confusion Matrix")
-        
-        # Load the model
-        model2 = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224.h5')
-        
-        # Make predictions
-        # Load X_test and y_test from CSV files
-        df_X_test = pd.read_csv(path_to_checkpoints+'VGG16_X_test.csv')
-        df_y_test = pd.read_csv(path_to_checkpoints+'VGG16_y_test.csv')
-
-        # Convert back to NumPy arrays if needed
-        X_test = df_X_test.values.reshape(-1, 224, 224, 3)  # Adjust shape as necessary
-        y_test = df_y_test['label'].values
-
-        y_pred = model2.predict(X_test)
-        y_pred_class = np.argmax(y_pred, axis=1)
-        
-        # Create the confusion matrix
-        cm = confusion_matrix(y_test, y_pred_class)
-        
-        # Plot the confusion matrix using seaborn
-        fig, ax = plt.subplots()
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
-
-        ax.set_xlabel('Predicted')
-        ax.set_ylabel('True')
-        
-        st.pyplot(fig)
-
-    with tab2:
-        # VGG16 Unfrozen Model - Confusion Matrix
-        st.subheader("VGG16 Unfrozen Model - Confusion Matrix")
-        
-        # Load the model
-        model3 = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224_unfreez_last_4.h5')
-        
-        # Make predictions
-        # Load X_test and y_test from CSV files
-        df_X_test = pd.read_csv(path_to_checkpoints+'VGG16_Unfreez_X_test.csv')
-        df_y_test = pd.read_csv(path_to_checkpoints+'VGG16_Unfreez_y_test.csv')
-
-        # Convert back to NumPy arrays if needed
-        X_test = df_X_test.values.reshape(-1, 224, 224, 3)  # Adjust shape as necessary
-        y_test = df_y_test['label'].values
-
-        y_pred = model3.predict(X_test)
-        y_pred_class = np.argmax(y_pred, axis=1)
-        
-        # Create the confusion matrix
-        cm = confusion_matrix(y_test, y_pred_class)
-        
-        # Plot the confusion matrix using seaborn
-        fig, ax = plt.subplots()
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=original_labels, yticklabels=original_labels)
-
-        ax.set_xlabel('Predicted')
-        ax.set_ylabel('True')
-        
-        st.pyplot(fig)
 
 @st.cache_resource
 def load_models():
