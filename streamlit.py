@@ -1,4 +1,6 @@
 import streamlit as st
+from streamlit_drawable_canvas import st_canvas
+
 import pandas as pd
 import numpy as np
 import os
@@ -530,10 +532,15 @@ def process_image(image, model_type):
         return image_array.reshape(1, 224, 224, 3)
 
 # Page4: Testing
+from streamlit_drawable_canvas import st_canvas
+import cv2
+
+# Page4: Testing
+# Page4: Testing
 if page == pages[4]:
     st.title("Testing the models")
-    st.write("Upload an image of a handwritten word from the list bellow and let a model you choose to predict the word.")
-    st.write("['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']")
+    st.write("Upload an image of a handwritten word or draw directly on the canvas below and let a model you choose predict the word.")
+    st.write("Available words for prediction: ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']")
 
     # Load models
     simple_cnn, vgg16_frozen, vgg16_unfrozen = load_models()
@@ -541,21 +548,58 @@ if page == pages[4]:
     # File upload widget
     uploaded_file = st.file_uploader("Upload an image (JPG or PNG)", type=["jpg", "jpeg", "png"])
 
+    # Create a canvas component for drawing
+    st.write("Or draw your word below:")
+    canvas_result = st_canvas(
+        fill_color="rgba(255, 255, 255, 1)",  # Fixed fill color with opacity
+        stroke_width=10,
+        stroke_color="black",
+        background_color="white",
+        width=224,
+        height=224,
+        drawing_mode="freedraw",
+        key="canvas"
+    )
+
+    # Process uploaded image or canvas drawing
+    image_to_predict = None
+
     if uploaded_file is not None:
         # Display the uploaded image
         st.image(uploaded_file, caption="Uploaded Image", width=300)
+        image_to_predict = uploaded_file
+    elif canvas_result.image_data is not None:
+        # If the canvas has a drawing, process it
+        st.image(canvas_result.image_data, caption="Drawn Image", width=300)
+        # Convert canvas image to uint8 and remove alpha channel
+        image_to_predict = cv2.cvtColor(canvas_result.image_data.astype(np.uint8), cv2.COLOR_RGBA2RGB)
 
+    if image_to_predict is not None:
         # Select which model to use for prediction
         model_choice = st.selectbox("Select the model to use for prediction:", 
-                                    ["Simple CNN Model (Grayscale)", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+                                    ["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
         # Predict button
         if st.button("Predict"):
-            # Process the uploaded image based on the selected model
-            processed_image = process_image(uploaded_file, model_choice)
+            # Process the uploaded image or drawn canvas based on the selected model
+            if isinstance(image_to_predict, np.ndarray):
+                # If it's from the canvas
+                if model_choice in ["VGG16 Frozen Model", "VGG16 Unfrozen Model"]:
+                    # Resize and normalize for VGG16 models
+                    processed_image = cv2.resize(image_to_predict, (224, 224)) / 255.0
+                elif model_choice == "Simple CNN Model":
+                    # Convert to grayscale for Simple CNN
+                    processed_image = cv2.cvtColor(image_to_predict, cv2.COLOR_RGB2GRAY)
+                    processed_image = cv2.resize(processed_image, (28, 28)) / 255.0
+                    processed_image = np.expand_dims(processed_image, axis=-1)  # Add channel dimension
+            else:
+                # If it's an uploaded file, process it accordingly
+                processed_image = process_image(image_to_predict, model_choice)
+
+            processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
 
             # Select the correct model based on user choice
-            if model_choice == "Simple CNN Model (Grayscale)":
+            if model_choice == "Simple CNN Model":
                 model = simple_cnn
             elif model_choice == "VGG16 Frozen Model":
                 model = vgg16_frozen
@@ -572,6 +616,7 @@ if page == pages[4]:
             # Display the predicted word
             st.write(f"Predicted word: **{labels[predicted_class_index]}**")
 
+# Page4: Key Results and Findings
 if page == pages[5]:
     st.write("### Key Results and Findings")
     st.markdown("""
