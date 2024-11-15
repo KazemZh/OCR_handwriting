@@ -15,14 +15,23 @@ import itertools
 import seaborn as sns
 
 from PIL import Image
+import cv2
 
 from nltk.corpus import stopwords
 import nltk
 
 import tensorflow as tf
-import streamlit as st
 from sklearn.metrics import confusion_matrix
 
+#path to checkpoints and several data required in the script
+path_to_checkpoints = "../models_check_points/"
+
+# Set the page configuration
+st.set_page_config(
+    page_title="Handwritten Text Recognition Project",
+    page_icon="📝",
+    layout="wide"  # This sets the page layout to wide mode
+)
 
 # Streamlit title
 st.title("Handwritten Recognition using Deep Learning and OCR Approach")
@@ -75,11 +84,78 @@ df = load_data()
 
 # Streamlit sidebar navigation
 st.sidebar.title("Table of contents")
-pages = ["Exploration", "Data Visualization", "Modeling"]
+pages = ["Introduction", "Exploration", "Data Visualization", "Modeling", "Testing", "Key Results and Findings"]
 page = st.sidebar.radio("Go to", pages)
 
+#Page0: Introduction
+if page==pages[0]:
+    st.title("Handwritten Text Recognition Using Deep Learning")
+    
+    st.markdown("""
+    ## Welcome to Our Handwritten Text Recognition Project!
+    Handwritten text recognition is a critical challenge in the field of **Optical Character Recognition (OCR)**, with widespread applications across industries like **healthcare, insurance, and administration**. In these sectors, vast amounts of paperwork are still handwritten, making it imperative to develop automated systems for digitizing documents efficiently and accurately.
+    
+    This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
+    """)
+
+    st.markdown("### Dataset Information")
+    st.write("""
+    The dataset used for this project is the **IAM Handwriting Database**.
+    
+    - **Dataset Link**: [IAM Handwriting Database](https://fki.tic.heia-fr.ch/databases/iam-handwriting-database)
+    - **Google Drive**: A copy of the dataset can also be found on Google Drive for easy access: [Google Drive Dataset Link](https://drive.google.com/drive/folders/188WHgj4Z4PE7l-N41XmUKNXnfux8TYbd?usp=drive_link)
+    
+    The dataset consists of **1,539 pages of scanned text** gathered from handwritten forms filled out by **657 writers**. These texts are then segmented into **115,000 individual labeled words**, providing a rich variety of handwriting styles for training and evaluation.
+    """)
+    # List of image paths to be displayed
+    st.write("""Sample handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
+    images_list = ['a01-000u.png', "a01-000u-00-00.png", "a01-000u-00-01.png", "a01-000u-00-02.png", "a01-000u-00-03.png", "a01-000u-00-04.png"]
+    image_path = []
+    for i in images_list:
+        image_path.append(path_to_checkpoints+i)
+    # Display all images
+    # Creating columns to place the images next to each other
+    col0, col1, col2, col3, col4, col5 = st.columns([10,1,4,2,4,3])
+    # Displaying each image in its respective column
+    with col0:
+        st.image(image_path[0], width=600)
+    with col1:
+        st.image(image_path[1], width=50)
+    with col2:
+        st.image(image_path[2], width=400)
+    with col3:
+        st.image(image_path[3], width=100)
+    with col4:
+        st.image(image_path[4], width=400)
+    with col5:
+        st.image(image_path[5], width=300)
+
+    st.markdown("### Project Motivation")
+    st.write("""
+    The primary motivation for this project is to contribute towards **automating document digitization** in industries where handwritten content is still prevalent. Converting handwritten forms into digital text can **save time**, **reduce manual errors**, and **cut costs** by eliminating the need for manual data entry.
+    """)
+
+    st.markdown("### Project Workflow and Approach")
+    st.markdown("""
+    1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
+    2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
+    3. **Dataset Balancing**: The dataset was balanced to improve model performance.
+    """)
+
+    st.markdown("### Project Team")
+    st.write("""
+    - **Claudia Wisniewski**
+    - **Kazem Zhour**
+    """)
+    st.markdown("**Mentor**: Yaniv")
+
+    st.markdown("### Get Involved")
+    st.write("""
+    The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
+    """)
+
 # Page1: Display content based on the selected page
-if page == pages[0]:
+if page == pages[1]:
     st.write("### Presentation of Data")
     st.dataframe(df.head(10))
     st.write(f"The dataset contains {df.shape[0]} rows and {df.shape[1]} columns.")
@@ -96,7 +172,7 @@ if page == pages[0]:
     st.dataframe(df.sample(10))
 
 # Page 2: Data Visualization
-if page == pages[1]:
+if page == pages[2]:
     st.title("Data Visualization")
 
 
@@ -246,9 +322,7 @@ if page == pages[1]:
             st.image(image, caption=f"Transcription: {row['transcription']}", use_container_width=True)
 
 # Page 3: Modeling
-
-if page == pages[2]:
-    path_to_checkpoints = "../models_check_points/"
+if page == pages[3]:
     st.subheader('Summary of Simple CNN model on filtered data')
     model = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
     # Capture model summary in a string buffer
@@ -271,6 +345,7 @@ if page == pages[2]:
                         )
 
     st.plotly_chart(fig)
+
     original_labels = ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']
 
     # Simple CNN model - Confusion Matrix
@@ -424,3 +499,83 @@ if page == pages[2]:
         ax.set_ylabel('True')
         
         st.pyplot(fig)
+
+@st.cache_resource
+def load_models():
+    # Load all three models: Simple CNN, VGG16 frozen, and VGG16 unfrozen
+    simple_cnn = tf.keras.models.load_model(path_to_checkpoints+'CNN.h5')
+    vgg16_frozen = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224.h5')
+    vgg16_unfrozen = tf.keras.models.load_model(path_to_checkpoints+'vgg16_224_unfreez_last_4.h5')
+    return simple_cnn, vgg16_frozen, vgg16_unfrozen
+
+# Function to preprocess the uploaded image
+def process_image(image, model_type):
+    # Read the image from the uploaded file
+    image = Image.open(image)
+
+    if model_type == "Simple CNN Model (Grayscale)":
+        # Convert to grayscale and resize for Simple CNN (28x28)
+        image = image.convert('L')
+        image = image.resize((28, 28))
+        image_array = np.array(image) / 255.0
+        # Reshape to match the input format expected by the model
+        return image_array.reshape(1, 28, 28, 1)
+
+    else:
+        # Assuming the model expects RGB images resized to 224x224 (as in VGG16)
+        image = image.convert('RGB')
+        image = image.resize((224, 224))
+        image_array = np.array(image) / 255.0
+        # Reshape to match the input format expected by the model
+        return image_array.reshape(1, 224, 224, 3)
+
+# Page4: Testing
+if page == pages[4]:
+    st.title("Testing the models")
+    st.write("Upload an image of a handwritten word from the list bellow and let a model you choose to predict the word.")
+    st.write("['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']")
+
+    # Load models
+    simple_cnn, vgg16_frozen, vgg16_unfrozen = load_models()
+
+    # File upload widget
+    uploaded_file = st.file_uploader("Upload an image (JPG or PNG)", type=["jpg", "jpeg", "png"])
+
+    if uploaded_file is not None:
+        # Display the uploaded image
+        st.image(uploaded_file, caption="Uploaded Image", width=300)
+
+        # Select which model to use for prediction
+        model_choice = st.selectbox("Select the model to use for prediction:", 
+                                    ["Simple CNN Model (Grayscale)", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+
+        # Predict button
+        if st.button("Predict"):
+            # Process the uploaded image based on the selected model
+            processed_image = process_image(uploaded_file, model_choice)
+
+            # Select the correct model based on user choice
+            if model_choice == "Simple CNN Model (Grayscale)":
+                model = simple_cnn
+            elif model_choice == "VGG16 Frozen Model":
+                model = vgg16_frozen
+            else:
+                model = vgg16_unfrozen
+
+            # Make the prediction
+            predictions = model.predict(processed_image)
+            predicted_class_index = np.argmax(predictions)
+
+            # List of labels (words)
+            labels = ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']
+            
+            # Display the predicted word
+            st.write(f"Predicted word: **{labels[predicted_class_index]}**")
+
+if page == pages[5]:
+    st.write("### Key Results and Findings")
+    st.markdown("""
+    - **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**.
+    - **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance.
+    - **Balanced Dataset and Transfer Learning**: By limiting the dataset to words with between **100-200 samples**, accuracy improved significantly to over **80%**. Using **transfer learning with VGG16** (unfreezing the last 4 layers) pushed the final accuracy to **90%**, which was the best-performing model.
+    """)
