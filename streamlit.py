@@ -75,7 +75,7 @@ def load_data():
             inexistent_or_corrupted += 1
 
     # Create a DataFrame from the collected data
-    df = pd.DataFrame(data, columns=['line_id', 'result', 'graylevel', 'x', 'y', 'w', 'h', 'annotation', 'transcription', 'image_path'])
+    df = pd.DataFrame(data, columns=['word_id', 'result', 'graylevel', 'x', 'y', 'w', 'h', 'annotation', 'transcription', 'image_path'])
 
     return df
 
