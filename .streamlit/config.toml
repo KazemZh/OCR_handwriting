@@ -1,0 +1,9 @@
+[theme]
+#primaryColor = "#F63366"  # A vibrant blue for primary elements
+backgroundColor = "aliceblue"  # A light grey background for easy reading
+secondaryBackgroundColor = "blueviolet"  # A slightly darker background for sections
+textColor = "black"  # Dark grey text color for readability
+font = "sans serif"  # Keeping it clean and modern
+
+[server]
+headless = true
