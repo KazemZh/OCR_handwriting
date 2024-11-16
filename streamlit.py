@@ -325,16 +325,80 @@ if page == pages[2]:
 
 # Page 3: Modeling
 if page == pages[3]:
-    tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
-
+    st.header("Models on Full Data")
+    tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
-    def display_model_info(model_name, model_path, history_file, conf_matrix_img):
-        st.header(f"{model_name} on Filtered Data")
+    def display_model_info(model_name, model_path, history_file, evaluation_metrics):
+        st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
         col1, col2, col3 = st.columns(3)
         with col1:
-            show_summary = st.button("Show Model Summary", key=f"{model_name}_summary")
+            show_summary = st.button("Show Model Architecture and Summary", key=f"{model_name}_summary")
+        with col2:
+            show_accuracy = st.button("Show Accuracy Over Epochs", key=f"{model_name}_accuracy")
+        with col3:
+            show_evaluation_metrics = st.button("Show Evaluation Metrics", key=f"{model_name}_metrics")
+
+        # Display sections based on button clicks
+        if show_summary:
+            st.markdown("#### Model Architecture")
+            st.image(model_path[0], width=600)
+            st.markdown("#### Model Summary")
+            st.image(model_path[1], width=600)
+
+        if show_accuracy:
+            st.markdown("#### Accuracy over Epochs")
+            # Load the history data
+            df_history = pd.read_csv(history_file)
+            # Create an accuracy plot
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+            fig.update_layout(
+                xaxis_title='Epoch',
+                yaxis_title='Accuracy',
+                legend_title='Legend',
+                width=700,
+                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+            )
+            st.plotly_chart(fig)
+
+        if show_evaluation_metrics:
+            st.markdown("#### Evaluation Metrics")
+            st.write('Mean Precision =', evaluation_metrics[0])
+            st.write('Mean Recall =', evaluation_metrics[1])
+            st.write('Mean F1-Score =', evaluation_metrics[2])
+
+    # Simple CNN Model Tab
+    with tab1:
+        display_model_info(
+            model_name="CNN Model",
+            model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'naive_cnn_model_summary.png'],
+            history_file=path_to_checkpoints + 'Naive_CNN_training_history.csv',
+            evaluation_metrics=[0.37, 0.45, 0.36]
+        )
+
+    # VGG16 Frozen Model Tab
+    with tab2:
+        display_model_info(
+            model_name="LeNet Model",
+            model_path=[path_to_checkpoints + 'LeNet.png', path_to_checkpoints + 'lenet_model_summary.png'],
+            history_file=path_to_checkpoints + 'LeNet_training_history.csv',
+            evaluation_metrics=[0.30, 0.34, 0.27]
+        )
+
+    st.header("Models on Filtered Data")
+    tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
+
+    # Define a helper function to display content based on button clicks
+    def display_model_info(model_name, model_path, history_file, conf_matrix_img):
+        st.subheader(f"{model_name}")
+
+        # Adding buttons side by side using columns
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            show_summary = st.button("Show Model Architecture and Summary", key=f"{model_name}_summary")
         with col2:
             show_accuracy = st.button("Show Accuracy Over Epochs", key=f"{model_name}_accuracy")
         with col3:
@@ -342,15 +406,17 @@ if page == pages[3]:
 
         # Display sections based on button clicks
         if show_summary:
-            st.subheader("Model Summary")
-            model = tf.keras.models.load_model(model_path)
+            st.markdown("#### Model Architecture")
+            st.image(model_path[0], width=800)
+            st.markdown("#### Model Summary")
+            model = tf.keras.models.load_model(model_path[1])
             # Capture model summary in a string buffer
             summary_str = io.StringIO()
             model.summary(print_fn=lambda x: summary_str.write(x + "\n"))
             st.text(summary_str.getvalue())
 
         if show_accuracy:
-            st.subheader("Accuracy Over Epochs")
+            st.markdown("#### Accuracy Over Epochs")
             # Load the history data
             df_history = pd.read_csv(history_file)
             # Create an accuracy plot
@@ -367,14 +433,14 @@ if page == pages[3]:
             st.plotly_chart(fig)
 
         if show_confusion_matrix:
-            st.subheader("Confusion Matrix")
+            st.markdown("#### Confusion Matrix")
             st.image(conf_matrix_img, width=700)
 
     # Simple CNN Model Tab
     with tab1:
         display_model_info(
             model_name="Simple CNN Model",
-            model_path=path_to_checkpoints + 'CNN.h5',
+            model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'CNN.h5'],
             history_file=path_to_checkpoints + 'CNN_training_history.csv',
             conf_matrix_img=path_to_checkpoints + 'cnn_model_conf_matrix.png'
         )
@@ -383,7 +449,7 @@ if page == pages[3]:
     with tab2:
         display_model_info(
             model_name="VGG16 Frozen Model",
-            model_path=path_to_checkpoints + 'vgg16_224.h5',
+            model_path=[path_to_checkpoints + 'vgg16-freez.png', path_to_checkpoints + 'vgg16_224.h5'],
             history_file=path_to_checkpoints + 'vgg16_training_history.csv',
             conf_matrix_img=path_to_checkpoints + 'vgg16_model_conf_matrix.png'
         )
@@ -392,7 +458,7 @@ if page == pages[3]:
     with tab3:
         display_model_info(
             model_name="VGG16 Unfrozen Model",
-            model_path=path_to_checkpoints + 'vgg16_224_unfreez_last_4.h5',
+            model_path=[path_to_checkpoints + 'vgg16-unfreez.png', path_to_checkpoints + 'vgg16_224_unfreez_last_4.h5'],
             history_file=path_to_checkpoints + 'vgg16_unfreez_training_history.csv',
             conf_matrix_img=path_to_checkpoints + 'vgg16_unfreez_model_conf_matrix.png'
         )
