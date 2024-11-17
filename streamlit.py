@@ -161,57 +161,57 @@ if page == pages[1]:
     st.write("### Construction of DataFrame")
     st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
 
-# Creating four columns for different buttons to display data information
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    head_data = st.button("View DataFrame", key="df_head")
-with col2:
-    random_data = st.button("View Random Rows", key="df_rand")
-with col3:
-    missing_values = st.button("Check Missing Values", key="df_na")
-with col4:
-    data_stat = st.button("View Summary Statistics", key="df_stat")
-
-# Handling button clicks to display relevant data
-if head_data:
-    col1, col2 = st.columns([2, 3])
+    # Creating four columns for different buttons to display data information
+    col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.write("#### Metadata Overview")
-        st.image(path_to_checkpoints + 'words_metadata.png', caption="Metadata Overview of the IAM Handwriting Database")
+        head_data = st.button("View DataFrame", key="df_head")
     with col2:
-        st.write("#### DataFrame Head")   
-        st.dataframe(df.head(10))
-        st.write(f"The dataset contains **{df.shape[0]} rows** and **{df.shape[1]} columns**.")
+        random_data = st.button("View Random Rows", key="df_rand")
+    with col3:
+        missing_values = st.button("Check Missing Values", key="df_na")
+    with col4:
+        data_stat = st.button("View Summary Statistics", key="df_stat")
+
+    # Handling button clicks to display relevant data
+    if head_data:
+        col1, col2 = st.columns([2, 3])
+        with col1:
+            st.write("#### Metadata Overview")
+            st.image(path_to_checkpoints + 'words_metadata.png', caption="Metadata Overview of the IAM Handwriting Database")
+        with col2:
+            st.write("#### DataFrame Head")   
+            st.dataframe(df.head(10))
+            st.write(f"The dataset contains **{df.shape[0]} rows** and **{df.shape[1]} columns**.")
+            st.markdown("""
+                This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
+                linking each word’s metadata to the path of the corresponding image in the dataset.
+            """)
+
+    if random_data:
+        st.write("### Random Rows from DataFrame")
+        st.dataframe(df.sample(10))
         st.markdown("""
-            This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
-            linking each word’s metadata to the path of the corresponding image in the dataset.
+            The randomly sampled rows provide a quick overview of the diversity of handwritten text samples. 
+            These random rows help in understanding the distribution of the data.
         """)
 
-if random_data:
-    st.write("### Random Rows from DataFrame")
-    st.dataframe(df.sample(10))
-    st.markdown("""
-        The randomly sampled rows provide a quick overview of the diversity of handwritten text samples. 
-        These random rows help in understanding the distribution of the data.
-    """)
+    if missing_values:
+        st.write("### Missing Values in DataFrame")
+        missing_values_summary = df.isnull().sum()
+        st.write(missing_values_summary)
+        if missing_values_summary.sum() == 0:
+            st.write("The DataFrame has **no missing values**, indicating data completeness.")
+        else:
+            st.write("There are missing values in the dataset that need to be addressed.")
 
-if missing_values:
-    st.write("### Missing Values in DataFrame")
-    missing_values_summary = df.isnull().sum()
-    st.write(missing_values_summary)
-    if missing_values_summary.sum() == 0:
-        st.write("The DataFrame has **no missing values**, indicating data completeness.")
-    else:
-        st.write("There are missing values in the dataset that need to be addressed.")
-
-if data_stat:
-    st.write("### Summary Statistics of the DataFrame")
-    st.write(df.describe())
-    st.markdown("""
-        These statistics provide key insights into the distribution of numerical columns such as the image dimensions,
-        grayscale values, and bounding box properties. It helps in understanding the range, average, and standard 
-        deviation of various features.
-    """)
+    if data_stat:
+        st.write("### Summary Statistics of the DataFrame")
+        st.write(df.describe())
+        st.markdown("""
+            These statistics provide key insights into the distribution of numerical columns such as the image dimensions,
+            grayscale values, and bounding box properties. It helps in understanding the range, average, and standard 
+            deviation of various features.
+        """)
 
 
 # Page 2: Data Visualization
