@@ -30,13 +30,12 @@ path_to_checkpoints = "../models_check_points/" # adjust this path according to 
 
 # Set the page configuration
 st.set_page_config(
-    page_title="Handwritten Text Recognition Project",
     page_icon="📝",
     layout="wide"  # This sets the page layout to wide mode
 )
 
 # Streamlit title
-st.title("Handwritten Recognition using Deep Learning and OCR Approach")
+st.title("Handwritten Text Recognition using Deep learning an OCR Approach")
 
 # Define a function to load data and cache it
 @st.cache_data
@@ -91,18 +90,16 @@ page = st.sidebar.radio("Go to", pages)
 
 #Page0: Introduction
 if page==pages[0]:
-    st.title("Handwritten Text Recognition Using Deep Learning")
-    
+
     st.markdown("""
     ## Welcome to Our Handwritten Text Recognition Project!
-    Handwritten text recognition is a critical challenge in the field of **Optical Character Recognition (OCR)**, with widespread applications across industries like **healthcare, insurance, and administration**. In these sectors, vast amounts of paperwork are still handwritten, making it imperative to develop automated systems for digitizing documents efficiently and accurately.
     
-    This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
+    This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents which is a critical challenge in this field. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
     """)
 
     st.markdown("### Project Motivation")
     st.write("""
-    The primary motivation for this project is to contribute towards **automating document digitization** in industries where handwritten content is still prevalent. Converting handwritten forms into digital text can **save time**, **reduce manual errors**, and **cut costs** by eliminating the need for manual data entry.
+    Our project aims to develop an effective OCR system for digitizing handwritten documents across various industries like **healthcare, insurance, and administration**, automating the conversion process to save time, reduce manual errors, and cut costs. By leveraging advancements in deep learning, we address the complexities of handwriting recognition, enhancing accuracy and contributing to the digitization of diverse handwriting styles.
     """)
 
     st.markdown("### Project Workflow and Approach")
@@ -117,7 +114,7 @@ if page==pages[0]:
     - **Claudia Wisniewski**
     - **Kazem Zhour**
     """)
-    st.markdown("**Mentor**: Yaniv")
+    st.markdown("**Mentor**: Yaniv Benichou")
 
     st.markdown("### Get Involved")
     st.write("""
@@ -162,14 +159,12 @@ if page == pages[1]:
     st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
 
     # Creating four columns for different buttons to display data information
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         head_data = st.button("View DataFrame", key="df_head")
     with col2:
-        random_data = st.button("View Random Rows", key="df_rand")
-    with col3:
         missing_values = st.button("Check Missing Values", key="df_na")
-    with col4:
+    with col3:
         data_stat = st.button("View Summary Statistics", key="df_stat")
 
     # Handling button clicks to display relevant data
@@ -186,14 +181,6 @@ if page == pages[1]:
                 This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
                 linking each word’s metadata to the path of the corresponding image in the dataset.
             """)
-
-    if random_data:
-        st.write("### Random Rows from DataFrame")
-        st.dataframe(df.sample(10))
-        st.markdown("""
-            The randomly sampled rows provide a quick overview of the diversity of handwritten text samples. 
-            These random rows help in understanding the distribution of the data.
-        """)
 
     if missing_values:
         st.write("### Missing Values in DataFrame")
@@ -367,7 +354,7 @@ if page == pages[2]:
 # Page 3: Modeling
 if page == pages[3]:
     st.header("Pre-Trained Engines")
-    st.markdown("PyTesseract, Doctr, EasyOCR, and Apache Tika were tested on both page-level and segmented word-level handwritten text. Although these models are well-known for detecting printed text, they performed poorly with handwritten text, likely because they were not trained on datasets containing handwritten samples.")
+    st.markdown("**PyTesseract**, **Doctr**, **EasyOCR**, and **Apache Tika** were tested on both **page-level** and **segmented word-level** handwritten text. Although these models are well-known for detecting printed text, they performed poorly with handwritten text, likely because they were not trained on datasets containing handwritten samples.")
     st.markdown("Therefore, we decided to customize our own model and train it on handwritten data from IAM Handwriting Database.")
     st.header("Customized Models on Full Data")
     tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
