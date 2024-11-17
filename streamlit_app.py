@@ -134,26 +134,32 @@ if page == pages[1]:
     """)
     # List of image paths to be displayed
     st.write("""Sample handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
-    images_list = ['a01-000u.png', "a01-000u-00-00.png", "a01-000u-00-01.png", "a01-000u-00-02.png", "a01-000u-00-03.png", "a01-000u-00-04.png"]
+    images_list = ['a01-000u.png', "a01-000u-00-00.png", "a01-000u-00-01.png", "a01-000u-00-02.png", "a01-000u-00-03.png", "a01-000u-00-04.png", "a01-000u-00-05.png", "a01-000u-00-06.png"]
     image_path = []
     for i in images_list:
         image_path.append(path_to_checkpoints+i)
     # Display all images
-    # Creating columns to place the images next to each other
-    col0, col1, col2, col3, col4, col5 = st.columns([10,1,4,2,4,3])
+    # Display the first image in its own column
+    col0 = st.columns([10])  # Single column for the first image
+    with col0[0]:
+        st.image(image_path[0], width=600)
+    # Creating columns to place the other images next to each other
+    col0, col1, col2, col3, col4, col5, col6 = st.columns([1,4,2,4,3,9,4])
     # Displaying each image in its respective column
     with col0:
-        st.image(image_path[0], width=600)
-    with col1:
         st.image(image_path[1], width=50)
-    with col2:
+    with col1:
         st.image(image_path[2], width=400)
-    with col3:
+    with col2:
         st.image(image_path[3], width=100)
-    with col4:
+    with col3:
         st.image(image_path[4], width=400)
-    with col5:
+    with col4:
         st.image(image_path[5], width=300)
+    with col5:
+        st.image(image_path[6], width=1000)
+    with col6:
+        st.image(image_path[7], width=400)
     
     st.write("### Construction of DataFrame")
     st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
