@@ -362,9 +362,11 @@ if page == pages[2]:
 if page == pages[3]:
     st.header("Pre-Trained Engines")
     st.markdown("**PyTesseract**, **Doctr**, **EasyOCR**, and **Apache Tika** were tested on both **page-level** and **segmented word-level** handwritten text. Although these models are well-known for detecting printed text, they performed poorly with handwritten text, likely because they were not trained on datasets containing handwritten samples.")
-    st.markdown("Therefore, we decided to customize our own model and train it on handwritten data from IAM Handwriting Database.")
+    st.markdown("Therefore, we decided to develop our own model and train it on handwritten data from IAM Handwriting Database.")
     st.header("Customized Models on Full Data")
-    tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
+    st.write('In our initial approach, we trained both a simple **Convolutional Neural Network (CNN)** and a more complex **LeNet model** using all available word images that appeared at least twice in the dataset. In total, we utilized **108,128 images** for training and testing.')
+
+    tab1, tab2, tab3 = st.tabs(["CNN Model", "LeNet Model", 'Optimization'])
     # Define a helper function to display content based on button clicks
     def display_model_info(model_name, model_path, history_file, evaluation_metrics):
         st.subheader(f"{model_name}")
@@ -404,10 +406,10 @@ if page == pages[3]:
 
         if show_evaluation_metrics:
             st.markdown("#### Evaluation Metrics")
-            st.write('Mean Precision =', evaluation_metrics[0])
-            st.write('Mean Recall =', evaluation_metrics[1])
-            st.write('Mean F1-Score =', evaluation_metrics[2])
-
+            # Use HTML to set the color of the text
+            st.markdown(f"Mean Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
+            st.markdown(f"Mean Recall = <span>{evaluation_metrics[1]}</span>", unsafe_allow_html=True)
+            st.markdown(f"Mean F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
     # Simple CNN Model Tab
     with tab1:
         display_model_info(
@@ -417,7 +419,7 @@ if page == pages[3]:
             evaluation_metrics=[0.37, 0.45, 0.36]
         )
 
-    # VGG16 Frozen Model Tab
+    # LeNet Model Tab
     with tab2:
         display_model_info(
             model_name="LeNet Model",
@@ -426,7 +428,18 @@ if page == pages[3]:
             evaluation_metrics=[0.30, 0.34, 0.27]
         )
 
+    # LeNet Model Tab
+    with tab3:
+        st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
+        st.markdown('''
+        - **Data Augmentation** using ImageDataGenerator
+        - **Callbacks**, specifically Early Stopping and Model Checkpoint
+        - **Class Weights** based on word distribution
+        ''')
+        st.write('Despite these adjustments, we did not see any relevant improvement in model performance.')
+
     st.header("Customized Models on Filtered Data")
+    st.write('In our second approach, we retrained the optimized **CNN model** from the initial attempt and also implemented a **VGG16 model** using transfer learning. We manually balanced our dataset to enhance training efficacy and to investigate whether the issues were related to class imbalance or the model architecture itself. We focused on a balanced subset of the data that included words with between 100 and 200 occurrences, totaling **2679 images and 20 unique words**.')
     tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
     # Define a helper function to display content based on button clicks
