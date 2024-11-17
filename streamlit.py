@@ -26,7 +26,7 @@ import tensorflow as tf
 from sklearn.metrics import confusion_matrix
 
 #path to checkpoints and several data required in the script
-path_to_checkpoints = "../models_check_points/"
+path_to_checkpoints = "../models_check_points/" # adjust this path according to your location of models_check_points directroy
 
 # Set the page configuration
 st.set_page_config(
@@ -100,6 +100,32 @@ if page==pages[0]:
     This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
     """)
 
+    st.markdown("### Project Motivation")
+    st.write("""
+    The primary motivation for this project is to contribute towards **automating document digitization** in industries where handwritten content is still prevalent. Converting handwritten forms into digital text can **save time**, **reduce manual errors**, and **cut costs** by eliminating the need for manual data entry.
+    """)
+
+    st.markdown("### Project Workflow and Approach")
+    st.markdown("""
+    1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
+    2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
+    3. **Dataset Balancing**: The dataset was balanced to improve model performance.
+    """)
+
+    st.markdown("### Project Team")
+    st.write("""
+    - **Claudia Wisniewski**
+    - **Kazem Zhour**
+    """)
+    st.markdown("**Mentor**: Yaniv")
+
+    st.markdown("### Get Involved")
+    st.write("""
+    The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
+    """)
+
+# Page1: Display content based on the selected page
+if page == pages[1]:
     st.markdown("### Dataset Information")
     st.write("""
     The dataset used for this project is the **IAM Handwriting Database**.
@@ -131,47 +157,62 @@ if page==pages[0]:
         st.image(image_path[4], width=400)
     with col5:
         st.image(image_path[5], width=300)
+    
+    st.write("### Construction of DataFrame")
+    st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
 
-    st.markdown("### Project Motivation")
-    st.write("""
-    The primary motivation for this project is to contribute towards **automating document digitization** in industries where handwritten content is still prevalent. Converting handwritten forms into digital text can **save time**, **reduce manual errors**, and **cut costs** by eliminating the need for manual data entry.
-    """)
+# Creating four columns for different buttons to display data information
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    head_data = st.button("View DataFrame", key="df_head")
+with col2:
+    random_data = st.button("View Random Rows", key="df_rand")
+with col3:
+    missing_values = st.button("Check Missing Values", key="df_na")
+with col4:
+    data_stat = st.button("View Summary Statistics", key="df_stat")
 
-    st.markdown("### Project Workflow and Approach")
-    st.markdown("""
-    1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
-    2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
-    3. **Dataset Balancing**: The dataset was balanced to improve model performance.
-    """)
+# Handling button clicks to display relevant data
+if head_data:
+    col1, col2 = st.columns([2, 3])
+    with col1:
+        st.write("#### Metadata Overview")
+        st.image(path_to_checkpoints + 'words_metadata.png', caption="Metadata Overview of the IAM Handwriting Database")
+    with col2:
+        st.write("#### DataFrame Head")   
+        st.dataframe(df.head(10))
+        st.write(f"The dataset contains **{df.shape[0]} rows** and **{df.shape[1]} columns**.")
+        st.markdown("""
+            This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
+            linking each word’s metadata to the path of the corresponding image in the dataset.
+        """)
 
-    st.markdown("### Project Team")
-    st.write("""
-    - **Claudia Wisniewski**
-    - **Kazem Zhour**
-    """)
-    st.markdown("**Mentor**: Yaniv")
-
-    st.markdown("### Get Involved")
-    st.write("""
-    The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
-    """)
-
-# Page1: Display content based on the selected page
-if page == pages[1]:
-    st.write("### Presentation of Data")
-    st.dataframe(df.head(10))
-    st.write(f"The dataset contains {df.shape[0]} rows and {df.shape[1]} columns.")
-    # Show number of missing values per column
-    st.write("### Missing Values")
-    missing_values = df.isnull().sum()
-    st.write(missing_values)
-    st.write("### Data Summary Statistics")
-    st.write(df.describe())
-    # Show data types of each column
-    st.write("### Data Types")
-    st.write(df.dtypes)
-    st.write("### Random Data Sample")
+if random_data:
+    st.write("### Random Rows from DataFrame")
     st.dataframe(df.sample(10))
+    st.markdown("""
+        The randomly sampled rows provide a quick overview of the diversity of handwritten text samples. 
+        These random rows help in understanding the distribution of the data.
+    """)
+
+if missing_values:
+    st.write("### Missing Values in DataFrame")
+    missing_values_summary = df.isnull().sum()
+    st.write(missing_values_summary)
+    if missing_values_summary.sum() == 0:
+        st.write("The DataFrame has **no missing values**, indicating data completeness.")
+    else:
+        st.write("There are missing values in the dataset that need to be addressed.")
+
+if data_stat:
+    st.write("### Summary Statistics of the DataFrame")
+    st.write(df.describe())
+    st.markdown("""
+        These statistics provide key insights into the distribution of numerical columns such as the image dimensions,
+        grayscale values, and bounding box properties. It helps in understanding the range, average, and standard 
+        deviation of various features.
+    """)
+
 
 # Page 2: Data Visualization
 if page == pages[2]:
@@ -325,7 +366,10 @@ if page == pages[2]:
 
 # Page 3: Modeling
 if page == pages[3]:
-    st.header("Models on Full Data")
+    st.header("Pre-Trained Engines")
+    st.markdown("PyTesseract, Doctr, EasyOCR, and Apache Tika were tested on both page-level and segmented word-level handwritten text. Although these models are well-known for detecting printed text, they performed poorly with handwritten text, likely because they were not trained on datasets containing handwritten samples.")
+    st.markdown("Therefore, we decided to customize our own model and train it on handwritten data from IAM Handwriting Database.")
+    st.header("Customized Models on Full Data")
     tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
     def display_model_info(model_name, model_path, history_file, evaluation_metrics):
@@ -388,7 +432,7 @@ if page == pages[3]:
             evaluation_metrics=[0.30, 0.34, 0.27]
         )
 
-    st.header("Models on Filtered Data")
+    st.header("Customized Models on Filtered Data")
     tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
     # Define a helper function to display content based on button clicks
