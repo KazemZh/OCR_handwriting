@@ -18,6 +18,7 @@ import seaborn as sns
 
 from PIL import Image
 import cv2
+from streamlit_drawable_canvas import st_canvas
 
 from nltk.corpus import stopwords
 import nltk
@@ -531,11 +532,6 @@ def process_image(image, model_type):
         return image_array.reshape(1, 224, 224, 3)
 
 # Page4: Testing
-from streamlit_drawable_canvas import st_canvas
-import cv2
-
-# Page4: Testing
-# Page4: Testing
 if page == pages[4]:
     st.title("Testing the models")
     st.write("Upload an image of a handwritten word or draw directly on the canvas below and let a model you choose predict the word.")
@@ -566,7 +562,7 @@ if page == pages[4]:
     if uploaded_file is not None:
         # Display the uploaded image
         st.image(uploaded_file, caption="Uploaded Image", width=300)
-        image_to_predict = uploaded_file
+        image_to_predict = cv2.imdecode(np.frombuffer(uploaded_file.read(), np.uint8), cv2.IMREAD_COLOR)
     elif canvas_result.image_data is not None:
         # If the canvas has a drawing, process it
         st.image(canvas_result.image_data, caption="Drawn Image", width=300)
@@ -581,21 +577,19 @@ if page == pages[4]:
         # Predict button
         if st.button("Predict"):
             # Process the uploaded image or drawn canvas based on the selected model
-            if isinstance(image_to_predict, np.ndarray):
-                # If it's from the canvas
-                if model_choice in ["VGG16 Frozen Model", "VGG16 Unfrozen Model"]:
-                    # Resize and normalize for VGG16 models
-                    processed_image = cv2.resize(image_to_predict, (224, 224)) / 255.0
-                elif model_choice == "Simple CNN Model":
-                    # Convert to grayscale for Simple CNN
-                    processed_image = cv2.cvtColor(image_to_predict, cv2.COLOR_RGB2GRAY)
-                    processed_image = cv2.resize(processed_image, (28, 28)) / 255.0
-                    processed_image = np.expand_dims(processed_image, axis=-1)  # Add channel dimension
-            else:
-                # If it's an uploaded file, process it accordingly
-                processed_image = process_image(image_to_predict, model_choice)
+            if model_choice in ["VGG16 Frozen Model", "VGG16 Unfrozen Model"]:
+                # Resize and normalize for VGG16 models
+                processed_image = cv2.resize(image_to_predict, (224, 224))
+                processed_image = processed_image / 255.0
+                processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
 
-            processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
+            elif model_choice == "Simple CNN Model":
+                # Convert to grayscale for Simple CNN
+                processed_image = cv2.cvtColor(image_to_predict, cv2.COLOR_RGB2GRAY)
+                processed_image = cv2.resize(processed_image, (28, 28))
+                processed_image = processed_image / 255.0
+                processed_image = np.expand_dims(processed_image, axis=-1)  # Add channel dimension
+                processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
 
             # Select the correct model based on user choice
             if model_choice == "Simple CNN Model":
@@ -615,7 +609,7 @@ if page == pages[4]:
             # Display the predicted word
             st.write(f"Predicted word: **{labels[predicted_class_index]}**")
 
-# Page4: Key Results and Findings
+# Page5: Key Results and Findings
 if page == pages[5]:
     st.write("### Key Results and Findings")
     st.markdown("""
