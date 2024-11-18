@@ -134,10 +134,16 @@ if page == pages[1]:
     - **Dataset Link**: [IAM Handwriting Database](https://fki.tic.heia-fr.ch/databases/iam-handwriting-database)
     - **Google Drive**: A copy of the dataset can also be found on Google Drive for easy access: [Google Drive Dataset Link](https://drive.google.com/drive/folders/188WHgj4Z4PE7l-N41XmUKNXnfux8TYbd?usp=drive_link)
     
-    The dataset consists of **1,539 pages of scanned text** gathered from handwritten forms filled out by **657 writers**. These texts are then segmented into **115,000 individual labeled words**, providing a rich variety of handwriting styles for training and evaluation.
+    This dataset consits of data containing:
+    - **1.539 pages** of scanned text
+    - from **657 unique writers**
+    - segmented into **115.318** individually labeled words
+     
+    It provides a rich variety of handwriting styles for training and evaluation.
     """)
+
     # List of image paths to be displayed
-    st.write("""Sample handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
+    st.write("""Sample of handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
     images_list = ['a01-000u.png', "a01-000u-00-00.png", "a01-000u-00-01.png", "a01-000u-00-02.png", "a01-000u-00-03.png", "a01-000u-00-04.png", "a01-000u-00-05.png", "a01-000u-00-06.png"]
     image_path = []
     for i in images_list:
@@ -169,12 +175,10 @@ if page == pages[1]:
     st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
 
     # Creating four columns for different buttons to display data information
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         head_data = st.button("View DataFrame", key="df_head")
     with col2:
-        missing_values = st.button("Check Missing Values", key="df_na")
-    with col3:
         data_stat = st.button("View Summary Statistics", key="df_stat")
 
     # Handling button clicks to display relevant data
@@ -191,15 +195,6 @@ if page == pages[1]:
                 This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
                 linking each word’s metadata to the path of the corresponding image in the dataset.
             """)
-
-    if missing_values:
-        st.write("### Missing Values in DataFrame")
-        missing_values_summary = df.isnull().sum()
-        st.write(missing_values_summary)
-        if missing_values_summary.sum() == 0:
-            st.write("The DataFrame has **no missing values**, indicating data completeness.")
-        else:
-            st.write("There are missing values in the dataset that need to be addressed.")
 
     if data_stat:
         st.write("### Summary Statistics of the DataFrame")
