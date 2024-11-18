@@ -384,14 +384,12 @@ if page == pages[3]:
         st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
-        col1, col2, col3, col4 = st.columns([0.1, 0.1,0.1, 0.1])
+        col1, col2, col3 = st.columns(3)
         with col1:
             show_summary = st.button("Show Model Architecture and Summary", key=f"{model_name}_summary")
         with col2:
             show_accuracy = st.button("Show Accuracy Over Epochs", key=f"{model_name}_accuracy")
         with col3:
-            show_evaluation_metrics = st.button("Show Evaluation Metrics", key=f"{model_name}_metrics")
-        with col4:
             show_training = st.button("Customized Training", key=f"{model_name}_training")
 
         # Display sections based on button clicks
@@ -422,9 +420,11 @@ if page == pages[3]:
             with col2:
                 st.markdown("#### Training Summary and Analysis")
                 if model_name == 'CNN Model':
-                    st.write("**Early Stopping Triggered at:** Epoch 31")
-                    st.write("**Training Accuracy:** 0.41")
-                    st.write("**Validation Accuracy:** 0.45")
+                    st.write("**Early Stopping Epochs**= 31")
+                    st.write("**Training Accuracy**= 0.41")
+                    st.write("**Validation Accuracy**= 0.45")
+                    st.markdown(f"Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
+                    st.markdown(f"F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
                     st.write("- Indicates the CNN model struggles to generalize effectively.")
                     st.write("- Low performance may be due to:")
                     st.write("    * Issues with the dataset")
@@ -432,22 +432,17 @@ if page == pages[3]:
                     st.write("- Training accuracy closely matches validation accuracy, suggesting potential underfitting.")
                     st.write("- Underfitting indicates a lack of complexity to capture underlying data patterns.")
                 elif model_name == 'LeNet Model':
-                    st.write("**Early Stopping Triggered at:** Epoch 28")
-                    st.write("**Training Accuracy:** 0.42")
-                    st.write("**Validation Accuracy:** 0.34")
+                    st.write("**Early Stopping Epochs**= 28")
+                    st.write("**Training Accuracy**= 0.42")
+                    st.write("**Validation Accuracy**= 0.34")
+                    st.markdown(f"Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
+                    st.markdown(f"F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)                    
                     st.write("- Indicates that the LeNet model struggles to generalize effectively.")
                     st.write("- Potential issues may include:")
                     st.write("    * Problems with the dataset")
                     st.write("    * Model design concerns")
                     st.write("- Zigzag pattern in validation accuracy suggests overfitting.")
                     st.write("- Overfitting means the model fits noise in the training data rather than learning generalizable patterns.")
-
-        if show_evaluation_metrics:
-            st.markdown("#### Evaluation Metrics")
-            # Use HTML to set the color of the text
-            st.markdown(f"Mean Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
-            st.markdown(f"Mean Recall = <span>{evaluation_metrics[1]}</span>", unsafe_allow_html=True)
-            st.markdown(f"Mean F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
         if show_training:            
         # Customized Training Button
             st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
@@ -505,20 +500,31 @@ if page == pages[3]:
             st.text(summary_str.getvalue())
 
         if show_accuracy:
-            # Load the history data
-            df_history = pd.read_csv(history_file)
-            # Create an accuracy plot
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-            fig.update_layout(
-                xaxis_title='Epoch',
-                yaxis_title='Accuracy',
-                legend_title='Legend',
-                width=700,
-                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-            )
-            st.plotly_chart(fig)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("#### Accuracy Over Epochs")
+                # Load the history data
+                df_history = pd.read_csv(history_file)
+                # Create an accuracy plot
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+                fig.update_layout(
+                    xaxis_title='Epoch',
+                    yaxis_title='Accuracy',
+                    legend_title='Legend',
+                    width=700,
+                    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                )
+                st.plotly_chart(fig)
+            with col2:
+                st.markdown("#### Training Summary and Analysis")
+                st.markdown(f"**Early Stopping Epochs** = <span>{Summary[0]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Training Accuracy** = <span>{Summary[1]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Validation Accuracy** = <span>{Summary[2]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Precision** = <span>{Summary[3]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**F1-score** = <span>{Summary[4]}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span>{Summary[5]}</span>", unsafe_allow_html=True)
 
         if show_confusion_matrix:
             st.markdown("#### Confusion Matrix")
@@ -664,38 +670,29 @@ if page == pages[4]:
 
 # Page5: Key Results and Findings
 if page == pages[5]:
-    st.write(
-        "1. **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**."
-    )
-    st.write(
-        "2. **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance."
-    )
-    st.write(
-        "3. **Balanced Dataset and Transfer Learning**: By limiting the dataset to words with between **100-200 samples**, accuracy improved significantly to over **80%**. Using **transfer learning with VGG16** (unfreezing the last 4 layers) pushed the final accuracy to **90%**, which was the best-performing model."
-    )
-
     # Conclusion
     st.header("Conclusion")
     st.write(
-        "We successfully tackled handwritten text recognition challenges using deep learning. Our findings show that optimizing datasets and employing transfer learning can significantly enhance OCR accuracy for handwritten text."
+        "- **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**."
+    )
+    st.write(
+        "- **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance."
+    )
+    st.write(
+        "- **Balanced Dataset and Transfer Learning**: By limiting the dataset to words with between **100-200 samples**, accuracy improved significantly to over **80%**. Using **transfer learning with VGG16** (unfreezing the last 4 layers) pushed the final accuracy to **90%**, which was the best-performing model."
+    )
+    st.write(
+        "- **In Summary**: We successfully tackled handwritten text recognition challenges using deep learning. Our findings show that **optimizing datasets and employing transfer learning** can significantly enhance OCR accuracy for handwritten text."
     )
 
     # Future Directions
     st.header("Future Directions")
     st.write(
-        "1. Explore specialized pre-trained networks for grayscale images."
+        "- **Use grammatical labels** to improve class imbalance in the dataset, or/and **expand the training dataset** with domain-specific vocabulary."
     )
     st.write(
-        "2. Expand the training dataset with domain-specific vocabulary."
+        "- **Fine-tune or add new techniques** to optimize the accuracy."
     )
     st.write(
-        "3. Improve class imbalance strategies using grammatical labels."
+        "- **Explore specialized pre-trained networks** for grayscale images."
     )
-    st.write(
-        "4. Fine-tune existing techniques for optimal accuracy."
-    )
-    st.write(
-        "5. Investigate real-time handwriting recognition applications."
-    )
-
-    st.write("This project highlights the potential of deep learning in enhancing OCR systems for handwritten documents.")
