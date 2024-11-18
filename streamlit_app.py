@@ -664,9 +664,38 @@ if page == pages[4]:
 
 # Page5: Key Results and Findings
 if page == pages[5]:
-    st.write("### Key Results and Findings")
-    st.markdown("""
-    - **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**.
-    - **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance.
-    - **Balanced Dataset and Transfer Learning**: By limiting the dataset to words with between **100-200 samples**, accuracy improved significantly to over **80%**. Using **transfer learning with VGG16** (unfreezing the last 4 layers) pushed the final accuracy to **90%**, which was the best-performing model.
-    """)
+    st.write(
+        "1. **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**."
+    )
+    st.write(
+        "2. **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance."
+    )
+    st.write(
+        "3. **Balanced Dataset and Transfer Learning**: By limiting the dataset to words with between **100-200 samples**, accuracy improved significantly to over **80%**. Using **transfer learning with VGG16** (unfreezing the last 4 layers) pushed the final accuracy to **90%**, which was the best-performing model."
+    )
+
+    # Conclusion
+    st.header("Conclusion")
+    st.write(
+        "We successfully tackled handwritten text recognition challenges using deep learning. Our findings show that optimizing datasets and employing transfer learning can significantly enhance OCR accuracy for handwritten text."
+    )
+
+    # Future Directions
+    st.header("Future Directions")
+    st.write(
+        "1. Explore specialized pre-trained networks for grayscale images."
+    )
+    st.write(
+        "2. Expand the training dataset with domain-specific vocabulary."
+    )
+    st.write(
+        "3. Improve class imbalance strategies using grammatical labels."
+    )
+    st.write(
+        "4. Fine-tune existing techniques for optimal accuracy."
+    )
+    st.write(
+        "5. Investigate real-time handwriting recognition applications."
+    )
+
+    st.write("This project highlights the potential of deep learning in enhancing OCR systems for handwritten documents.")
