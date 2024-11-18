@@ -97,30 +97,33 @@ if page==pages[0]:
     
     This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents which is a critical challenge in this field. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
     """)
+    
+    tab1, tab2, tab3 = st.tabs(["Motivation", "Workflow and Approach", "Project Team"])
 
-    st.markdown("### Project Motivation")
-    st.write("""
-    Our project aims to develop an effective OCR system for digitizing handwritten documents across various industries like **healthcare, insurance, and administration**, automating the conversion process to save time, reduce manual errors, and cut costs. By leveraging advancements in deep learning, we address the complexities of handwriting recognition, enhancing accuracy and contributing to the digitization of diverse handwriting styles.
-    """)
+    with tab1:
+        st.markdown("### Project Motivation")
+        st.write("""
+        Our project aims to develop an effective OCR system for digitizing handwritten documents across various industries like **healthcare, insurance, and administration**, automating the conversion process to save time, reduce manual errors, and cut costs. By leveraging advancements in deep learning, we address the complexities of handwriting recognition, enhancing accuracy and contributing to the digitization of diverse handwriting styles.
+        """)
+    with tab2:
+        st.markdown("### Project Workflow and Approach")
+        st.markdown("""
+        1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
+        2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
+        3. **Dataset Balancing**: The dataset was balanced to improve model performance.
+        """)
+    with tab3:
+        st.markdown("### Project Team")
+        st.write("""
+        - **Claudia Wisniewski**
+        - **Kazem Zhour**
+        """)
+        st.markdown("**Mentor**: Yaniv Benichou")
 
-    st.markdown("### Project Workflow and Approach")
-    st.markdown("""
-    1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
-    2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
-    3. **Dataset Balancing**: The dataset was balanced to improve model performance.
-    """)
-
-    st.markdown("### Project Team")
-    st.write("""
-    - **Claudia Wisniewski**
-    - **Kazem Zhour**
-    """)
-    st.markdown("**Mentor**: Yaniv Benichou")
-
-    st.markdown("### Get Involved")
-    st.write("""
-    The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
-    """)
+        st.markdown("### Get Involved")
+        st.write("""
+        The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
+        """)
 
 # Page1: Display content based on the selected page
 if page == pages[1]:
