@@ -378,19 +378,21 @@ if page == pages[3]:
     st.header("Customized Models on Full Data")
     st.write('In our initial approach, we trained both a simple **Convolutional Neural Network (CNN)** and a more complex **LeNet model** using all available word images that appeared at least twice in the dataset. In total, we utilized **108,128 images** for training and testing.')
 
-    tab1, tab2, tab3 = st.tabs(["CNN Model", "LeNet Model", 'Optimization'])
+    tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
     def display_model_info(model_name, model_path, history_file, evaluation_metrics):
         st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns([0.1, 0.1,0.1, 0.1])
         with col1:
             show_summary = st.button("Show Model Architecture and Summary", key=f"{model_name}_summary")
         with col2:
             show_accuracy = st.button("Show Accuracy Over Epochs", key=f"{model_name}_accuracy")
         with col3:
             show_evaluation_metrics = st.button("Show Evaluation Metrics", key=f"{model_name}_metrics")
+        with col4:
+            show_training = st.button("Customized Training", key=f"{model_name}_training")
 
         # Display sections based on button clicks
         if show_summary:
@@ -399,22 +401,46 @@ if page == pages[3]:
             st.markdown("#### Model Summary")
             st.image(model_path[1], width=600)
 
+        col1, col2 = st.columns(2)
         if show_accuracy:
-            st.markdown("#### Accuracy over Epochs")
-            # Load the history data
-            df_history = pd.read_csv(history_file)
-            # Create an accuracy plot
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-            fig.update_layout(
-                xaxis_title='Epoch',
-                yaxis_title='Accuracy',
-                legend_title='Legend',
-                width=700,
-                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-            )
-            st.plotly_chart(fig)
+            with col1:
+                st.markdown("#### Accuracy over Epochs")
+                # Load the history data
+                df_history = pd.read_csv(history_file)
+                # Create an accuracy plot
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+                fig.update_layout(
+                    xaxis_title='Epoch',
+                    yaxis_title='Accuracy',
+                    legend_title='Legend',
+                    width=700,
+                    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                )
+                st.plotly_chart(fig)
+            with col2:
+                st.markdown("#### Training Summary and Analysis")
+                if model_name == 'CNN Model':
+                    st.write("**Early Stopping Triggered at:** Epoch 31")
+                    st.write("**Training Accuracy:** 0.41")
+                    st.write("**Validation Accuracy:** 0.45")
+                    st.write("- Indicates the CNN model struggles to generalize effectively.")
+                    st.write("- Low performance may be due to:")
+                    st.write("    * Issues with the dataset")
+                    st.write("    * Model architecture concerns")
+                    st.write("- Training accuracy closely matches validation accuracy, suggesting potential underfitting.")
+                    st.write("- Underfitting indicates a lack of complexity to capture underlying data patterns.")
+                elif model_name == 'LeNet Model':
+                    st.write("**Early Stopping Triggered at:** Epoch 28")
+                    st.write("**Training Accuracy:** 0.42")
+                    st.write("**Validation Accuracy:** 0.34")
+                    st.write("- Indicates that the LeNet model struggles to generalize effectively.")
+                    st.write("- Potential issues may include:")
+                    st.write("    * Problems with the dataset")
+                    st.write("    * Model design concerns")
+                    st.write("- Zigzag pattern in validation accuracy suggests overfitting.")
+                    st.write("- Overfitting means the model fits noise in the training data rather than learning generalizable patterns.")
 
         if show_evaluation_metrics:
             st.markdown("#### Evaluation Metrics")
@@ -422,6 +448,16 @@ if page == pages[3]:
             st.markdown(f"Mean Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
             st.markdown(f"Mean Recall = <span>{evaluation_metrics[1]}</span>", unsafe_allow_html=True)
             st.markdown(f"Mean F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
+        if show_training:            
+        # Customized Training Button
+            st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
+            st.markdown('''
+            - **Data Augmentation** using ImageDataGenerator
+            - **Callbacks**, specifically Early Stopping and Model Checkpoint
+            - **Class Weights** based on word distribution
+            ''')
+            st.write('Despite these adjustments, we did not see any relevant improvement in model performance. Therefore we continued with the LeNet Model. ')
+            
     # Simple CNN Model Tab
     with tab1:
         display_model_info(
@@ -439,16 +475,6 @@ if page == pages[3]:
             history_file=path_to_checkpoints + 'LeNet_training_history.csv',
             evaluation_metrics=[0.30, 0.34, 0.27]
         )
-
-    # LeNet Model Tab
-    with tab3:
-        st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
-        st.markdown('''
-        - **Data Augmentation** using ImageDataGenerator
-        - **Callbacks**, specifically Early Stopping and Model Checkpoint
-        - **Class Weights** based on word distribution
-        ''')
-        st.write('Despite these adjustments, we did not see any relevant improvement in model performance.')
 
     st.header("Customized Models on Filtered Data")
     st.write('In our second approach, we retrained the optimized **CNN model** from the initial attempt and also implemented a **VGG16 model** using transfer learning. We manually balanced our dataset to enhance training efficacy and to investigate whether the issues were related to class imbalance or the model architecture itself. We focused on a balanced subset of the data that included words with between 100 and 200 occurrences, totaling **2679 images and 20 unique words**.')
@@ -479,31 +505,20 @@ if page == pages[3]:
             st.text(summary_str.getvalue())
 
         if show_accuracy:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("#### Accuracy Over Epochs")
-                # Load the history data
-                df_history = pd.read_csv(history_file)
-                # Create an accuracy plot
-                fig = go.Figure()
-                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-                fig.update_layout(
-                    xaxis_title='Epoch',
-                    yaxis_title='Accuracy',
-                    legend_title='Legend',
-                    width=700,
-                    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-                )
-                st.plotly_chart(fig)
-            with col2:
-                st.markdown("#### Training Summary and Analysis")
-                st.markdown(f"**Early Stopping Epochs** = <span>{Summary[0]}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Accuracy** = <span>{Summary[1]}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Validation Accuracy** = <span>{Summary[2]}</span>", unsafe_allow_html=True)
-                st.markdown(f"**Mean Precision** = <span>{Summary[3]}</span>", unsafe_allow_html=True)
-                st.markdown(f"**F1-score** = <span>{Summary[4]}</span>", unsafe_allow_html=True)
-                st.markdown(f"<span>{Summary[5]}</span>", unsafe_allow_html=True)
+            # Load the history data
+            df_history = pd.read_csv(history_file)
+            # Create an accuracy plot
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+            fig.update_layout(
+                xaxis_title='Epoch',
+                yaxis_title='Accuracy',
+                legend_title='Legend',
+                width=700,
+                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+            )
+            st.plotly_chart(fig)
 
         if show_confusion_matrix:
             st.markdown("#### Confusion Matrix")
