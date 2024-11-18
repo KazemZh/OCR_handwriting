@@ -207,11 +207,9 @@ if page == pages[1]:
             deviation of various features.
         """)
 
-
 # Page 2: Data Visualization
 if page == pages[2]:
     st.title("Data Visualization")
-
 
     # --- Plot 1: Frequency of Repetitions of Transcriptions ---
     st.write("### Frequency of Repetitions of Transcriptions")
@@ -288,6 +286,14 @@ if page == pages[2]:
     # Display the plot using Streamlit
     st.plotly_chart(fig1, use_container_width=True)
 
+    # Add Keys points
+    st.markdown("""
+    The dataset exhibited a **significant divergence in word frequency**, with the majority of words appearing only a few times. Specifically, many words had only one transcription, which made it challenging for the model to learn effectively.
+
+    In our **initial models**, we chose to omit words that appeared only **once**, as they did not provide sufficient data for training a **Convolutional Neural Network (CNN)** effectively.
+    """)
+
+
     # --- Filtering Transcriptions ---
     # Set filtering parameters
     min_samples = 100
@@ -305,10 +311,15 @@ if page == pages[2]:
     stop_words.update([')', ':', '...', "'s"])
     df_filtered = df_filtered[~df_filtered['transcription'].isin(stop_words)]
 
-    # Display the number of unique transcriptions remaining
-    st.write(f"Number of unique transcriptions with samples between 100 and 200: {df_filtered['transcription'].nunique()}")
     # --- Plot 2 and Unique Transcriptions Side by Side ---
     st.write("### Counts of Each Transcription of Unique Transcriptions Remaining after filtering")
+
+    # Add Keys points
+    st.markdown("""
+    For the **advanced models**, we further refined our data handling approach by removing words with **fewer than 100 occurrences** and limiting the dataset to words with **less than 200 occurrences**. 
+
+    After removing stopwords using the Natural Language Toolkit (nltk) package and manually excluding specific unwanted transcriptions, we ended up with **only 20 unique words**.
+    """)
 
     # Plot 2: Counts of Each Transcription in the first column
     # Create a DataFrame for plotting purposes
@@ -339,6 +350,7 @@ if page == pages[2]:
 
 # --- Display 6 Random Images from Dataset ---
     st.write("### Sample Images from the Filtered Dataset")
+    st.markdown(""" Here we present some random samples of the images used for training our models, before any preprocessing was applied. """)    
 
     # Select 6 random images from the filtered dataset
     if len(df_filtered) > 6:
