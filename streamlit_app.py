@@ -675,11 +675,11 @@ if page == pages[5]:
     # Future Directions
     st.header("Future Directions")
     st.write(
-        "- **Use grammatical labels** to improve class imbalance in the dataset, or/and **expand the training dataset** with domain-specific vocabulary."
+        "- **Enhance Dataset Quality**: Utilize **grammatical labels** to address class imbalance and **expand the dataset** with domain-specific vocabulary."
     )
     st.write(
-        "- **Fine-tune or add new techniques** to optimize the accuracy."
+        "- **Optimize Model Performance**: **Fine-tune existing models** and experiment with **model architecture alternatives** to enhance accuracy."
     )
     st.write(
-        "- **Explore specialized pre-trained networks** for grayscale images."
+        "- **Explore Pre-trained Networks**: Investigate specialized pre-trained networks tailored for **grayscale images**."
     )
