@@ -455,7 +455,7 @@ if page == pages[3]:
     tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
     # Define a helper function to display content based on button clicks
-    def display_model_info(model_name, model_path, history_file, conf_matrix_img):
+    def display_model_info(model_name, model_path, history_file, Summary, conf_matrix_img):
         st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
@@ -479,21 +479,31 @@ if page == pages[3]:
             st.text(summary_str.getvalue())
 
         if show_accuracy:
-            st.markdown("#### Accuracy Over Epochs")
-            # Load the history data
-            df_history = pd.read_csv(history_file)
-            # Create an accuracy plot
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
-            fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
-            fig.update_layout(
-                xaxis_title='Epoch',
-                yaxis_title='Accuracy',
-                legend_title='Legend',
-                width=700,
-                yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
-            )
-            st.plotly_chart(fig)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("#### Accuracy Over Epochs")
+                # Load the history data
+                df_history = pd.read_csv(history_file)
+                # Create an accuracy plot
+                fig = go.Figure()
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Accuracy'], mode='lines', name='Training Accuracy'))
+                fig.add_trace(go.Scatter(x=df_history['Epoch'], y=df_history['Val_Accuracy'], mode='lines', name='Validation Accuracy'))
+                fig.update_layout(
+                    xaxis_title='Epoch',
+                    yaxis_title='Accuracy',
+                    legend_title='Legend',
+                    width=700,
+                    yaxis=dict(range=[0, 1])  # Set y-axis limit from 0 to 1
+                )
+                st.plotly_chart(fig)
+            with col2:
+                st.markdown("#### Training Summary and Analysis")
+                st.markdown(f"**Early Stopping Epochs** = <span>{Summary[0]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Accuracy** = <span>{Summary[1]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Validation Accuracy** = <span>{Summary[2]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Mean Precision** = <span>{Summary[3]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**F1-score** = <span>{Summary[4]}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span>{Summary[5]}</span>", unsafe_allow_html=True)
 
         if show_confusion_matrix:
             st.markdown("#### Confusion Matrix")
@@ -505,6 +515,7 @@ if page == pages[3]:
             model_name="Simple CNN Model",
             model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'CNN.h5'],
             history_file=path_to_checkpoints + 'CNN_training_history.csv',
+            Summary = [31, 0.79, 0.83, 0.82, 0.80, "\u2022 Filtering our data significantly improved the model's accuracy, highlighting that the imbalance in previous versions was the primary cause of the unsatisfactory results."],
             conf_matrix_img=path_to_checkpoints + 'cnn_model_conf_matrix.png'
         )
 
@@ -514,6 +525,7 @@ if page == pages[3]:
             model_name="VGG16 Frozen Model",
             model_path=[path_to_checkpoints + 'vgg16-freez.png', path_to_checkpoints + 'vgg16_224.h5'],
             history_file=path_to_checkpoints + 'vgg16_training_history.csv',
+            Summary = [31, 0.86, 0.85, 0.86, 0.85, "\u2022 Applying transfer learning using the VGG16 model further improved the accuracy of our model."],
             conf_matrix_img=path_to_checkpoints + 'vgg16_model_conf_matrix.png'
         )
 
@@ -523,6 +535,7 @@ if page == pages[3]:
             model_name="VGG16 Unfrozen Model",
             model_path=[path_to_checkpoints + 'vgg16-unfreez.png', path_to_checkpoints + 'vgg16_224_unfreez_last_4.h5'],
             history_file=path_to_checkpoints + 'vgg16_unfreez_training_history.csv',
+            Summary = [31, 0.97, 0.90, 0.91, 0.90, "\u2022 Unfreezing the last four layers of the VGG16 model significantly improved the model's accuracy."],
             conf_matrix_img=path_to_checkpoints + 'vgg16_unfreez_model_conf_matrix.png'
         )
     
