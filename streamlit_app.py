@@ -380,7 +380,7 @@ if page == pages[3]:
 
     tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
-    def display_model_info(model_name, model_path, history_file, evaluation_metrics):
+    def display_model_info(model_name, model_path, history_file, Summary):
         st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
@@ -419,30 +419,13 @@ if page == pages[3]:
                 st.plotly_chart(fig)
             with col2:
                 st.markdown("#### Training Summary and Analysis")
-                if model_name == 'CNN Model':
-                    st.write("**Early Stopping Epochs**= 31")
-                    st.write("**Training Accuracy**= 0.41")
-                    st.write("**Validation Accuracy**= 0.45")
-                    st.markdown(f"Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
-                    st.markdown(f"F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
-                    st.write("- Indicates the CNN model struggles to generalize effectively.")
-                    st.write("- Low performance may be due to:")
-                    st.write("    * Issues with the dataset")
-                    st.write("    * Model architecture concerns")
-                    st.write("- Training accuracy closely matches validation accuracy, suggesting potential underfitting.")
-                    st.write("- Underfitting indicates a lack of complexity to capture underlying data patterns.")
-                elif model_name == 'LeNet Model':
-                    st.write("**Early Stopping Epochs**= 28")
-                    st.write("**Training Accuracy**= 0.42")
-                    st.write("**Validation Accuracy**= 0.34")
-                    st.markdown(f"Precision = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
-                    st.markdown(f"F1-Score = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)                    
-                    st.write("- Indicates that the LeNet model struggles to generalize effectively.")
-                    st.write("- Potential issues may include:")
-                    st.write("    * Problems with the dataset")
-                    st.write("    * Model design concerns")
-                    st.write("- Zigzag pattern in validation accuracy suggests overfitting.")
-                    st.write("- Overfitting means the model fits noise in the training data rather than learning generalizable patterns.")
+                st.markdown(f"**Early Stopping Epochs** = <span>{Summary[0]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Training Accuracy** = <span>{Summary[1]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Validation Accuracy** = <span>{Summary[2]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**Precision** = <span>{Summary[3]}</span>", unsafe_allow_html=True)
+                st.markdown(f"**F1-score** = <span>{Summary[4]}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span>{Summary[5]}</span>", unsafe_allow_html=True)
+                st.markdown(f"<span>{Summary[6]}</span>", unsafe_allow_html=True)
         if show_training:            
         # Customized Training Button
             st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
@@ -459,7 +442,9 @@ if page == pages[3]:
             model_name="CNN Model",
             model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'naive_cnn_model_summary.png'],
             history_file=path_to_checkpoints + 'Naive_CNN_training_history.csv',
-            evaluation_metrics=[0.37, 0.45, 0.36]
+            Summary = [31, 0.41, 0.45, 0.37, 0.36,
+                       "\u2022 The CNN model struggles to generalize effectively, due to incufficient dataset samples ot Model architecture.",
+                       "\u2022 Training accuracy closely matches validation accuracy, suggesting potential underfitting, which indicates a lack of complexity to capture underlying data patterns."]
         )
 
     # LeNet Model Tab
@@ -468,7 +453,9 @@ if page == pages[3]:
             model_name="LeNet Model",
             model_path=[path_to_checkpoints + 'LeNet.png', path_to_checkpoints + 'lenet_model_summary.png'],
             history_file=path_to_checkpoints + 'LeNet_training_history.csv',
-            evaluation_metrics=[0.30, 0.34, 0.27]
+            Summary = [28, 0.42, 0.34, 0.30, 0.27,
+                       "\u2022 Similar to the CNN Model results the LeNet model struggles to generalize effectively.",
+                       "\u2022 The Zigzag pattern in validation accuracy suggests overfitting, which means the model fits noise in the training data rather than learning generalizable patterns."]
         )
 
     st.header("Customized Models on Filtered Data")
