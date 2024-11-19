@@ -431,16 +431,16 @@ if page == pages[3]:
                     st.write("**Early Stopping Epochs**= 31")
                     st.write("**Training Accuracy**= 0.41")
                     st.write("**Validation Accuracy**= 0.45")
-                    st.markdown(f"**Precision** = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
-                    st.markdown(f"**F1-Score** = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
+                    st.write("**Precision** = 0.37 ")
+                    st.write("**F1-Score** = 0.36")
                     st.write("- The CNN model struggles to generalize effectively, likely due to **imbalanced samples** in the dataset or **limitations in the  model architecture**.")
                     st.write("- The training accuracy closely matches the validation accuracy, suggesting potential **underfitting**. This indicates that the model may lack sufficient complexity to capture the underlying data patterns effectively.")
                 elif model_name == 'LeNet Model':
                     st.write("**Early Stopping Epochs**= 28")
                     st.write("**Training Accuracy**= 0.42")
                     st.write("**Validation Accuracy**= 0.34")
-                    st.markdown(f"**Precision** = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
-                    st.markdown(f"**F1-Score** = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)                    
+                    st.markdown("**Precision** = 0.3")
+                    st.markdown("**F1-Score** = 0.27")                    
                     st.write("- A similar generalization issue, as observed in the CNN model, appears consistently.")
                     st.write("- The zigzag pattern in validation accuracy suggests overfitting, indicating that the model may be fitting to noise rather than learning generalizable patterns.")
         if show_training:            
@@ -459,7 +459,7 @@ if page == pages[3]:
             model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'naive_cnn_model_summary.png'],
             history_file=path_to_checkpoints + 'Naive_CNN_training_history.csv',
             Summary = [31, 0.41, 0.45, 0.37, 0.36,
-                       "\u2022 The CNN model struggles to generalize effectively, due to incufficient dataset samples ot Model architecture.",
+                       "\u2022 The CNN model struggles to generalize effectively, due to insufficient dataset samples ot Model architecture.",
                        "\u2022 Training accuracy closely matches validation accuracy, suggesting potential underfitting, which indicates a lack of complexity to capture underlying data patterns."]
         )
 
