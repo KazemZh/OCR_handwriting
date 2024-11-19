@@ -36,7 +36,7 @@ st.set_page_config(
 )
 
 # Streamlit title
-st.title("Handwritten Text Recognition using Deep learning an OCR Approach")
+st.title("Handwritten Text Recognition using Deep learning - an OCR Approach")
 
 # Define a function to load data and cache it
 @st.cache_data
@@ -98,30 +98,33 @@ if page==pages[0]:
     
     This project aims to develop a deep learning-based OCR system capable of accurately recognizing and extracting text from handwritten documents which is a critical challenge in this field. Our focus was to leverage the latest **deep learning** technologies, including custom **Convolutional Neural Networks (CNNs)** and **transfer learning** with **VGG16**, to overcome the challenges of recognizing diverse handwriting styles.
     """)
+    
+    tab1, tab2, tab3 = st.tabs(["Motivation", "Workflow and Approach", "Project Team"])
 
-    st.markdown("### Project Motivation")
-    st.write("""
-    Our project aims to develop an effective OCR system for digitizing handwritten documents across various industries like **healthcare, insurance, and administration**, automating the conversion process to save time, reduce manual errors, and cut costs. By leveraging advancements in deep learning, we address the complexities of handwriting recognition, enhancing accuracy and contributing to the digitization of diverse handwriting styles.
-    """)
+    with tab1:
+        st.markdown("### Project Motivation")
+        st.write("""
+        Our project aims to develop an effective OCR system for digitizing handwritten documents across various industries like **healthcare, insurance, and administration**, automating the conversion process to save time, reduce manual errors, and cut costs. By leveraging advancements in deep learning, we address the complexities of handwriting recognition, enhancing accuracy and contributing to the digitization of diverse handwriting styles.
+        """)
+    with tab2:
+        st.markdown("### Project Workflow and Approach")
+        st.markdown("""
+        1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
+        2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
+        3. **Dataset Balancing**: The dataset was balanced to improve model performance.
+        """)
+    with tab3:
+        st.markdown("### Project Team")
+        st.write("""
+        - **Claudia Wisniewski**
+        - **Kazem Zhour**
+        """)
+        st.markdown("**Mentor**: Yaniv Benichou")
 
-    st.markdown("### Project Workflow and Approach")
-    st.markdown("""
-    1. **Exploration of Available OCR Tools**: We started by assessing existing OCR tools like **PyTesseract**, **docTR**, **EasyOCR**, and **Apache Tika**. While these tools are great for typed text, they showed significant limitations in recognizing handwritten texts.
-    2. **Custom Deep Learning Models**: Given the limitations of existing OCR tools, we developed our own custom models. We began with a simple **Convolutional Neural Network (CNN)** and **LeNet**, before moving to more advanced techniques like **transfer learning** using **VGG16**.
-    3. **Dataset Balancing**: The dataset was balanced to improve model performance.
-    """)
-
-    st.markdown("### Project Team")
-    st.write("""
-    - **Claudia Wisniewski**
-    - **Kazem Zhour**
-    """)
-    st.markdown("**Mentor**: Yaniv Benichou")
-
-    st.markdown("### Get Involved")
-    st.write("""
-    The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
-    """)
+        st.markdown("### Get Involved")
+        st.write("""
+        The code, models, and resources used in this project are available for collaboration on [GitHub](https://github.com/KazemZh/OCR_handwriting). We welcome contributions and feedback.
+        """)
 
 # Page1: Display content based on the selected page
 if page == pages[1]:
@@ -132,10 +135,16 @@ if page == pages[1]:
     - **Dataset Link**: [IAM Handwriting Database](https://fki.tic.heia-fr.ch/databases/iam-handwriting-database)
     - **Google Drive**: A copy of the dataset can also be found on Google Drive for easy access: [Google Drive Dataset Link](https://drive.google.com/drive/folders/188WHgj4Z4PE7l-N41XmUKNXnfux8TYbd?usp=drive_link)
     
-    The dataset consists of **1,539 pages of scanned text** gathered from handwritten forms filled out by **657 writers**. These texts are then segmented into **115,000 individual labeled words**, providing a rich variety of handwriting styles for training and evaluation.
+    This dataset consits of data containing:
+    - **1.539 pages** of scanned text
+    - from **657 unique writers**
+    - segmented into **115.318** individually labeled words
+     
+    It provides a rich variety of handwriting styles for training and evaluation.
     """)
+
     # List of image paths to be displayed
-    st.write("""Sample handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
+    st.write("""Sample of handwritten forms and some corresponding segmented words from the IAM Handwriting Database""")
     images_list = ['a01-000u.png', "a01-000u-00-00.png", "a01-000u-00-01.png", "a01-000u-00-02.png", "a01-000u-00-03.png", "a01-000u-00-04.png", "a01-000u-00-05.png", "a01-000u-00-06.png"]
     image_path = []
     for i in images_list:
@@ -167,12 +176,10 @@ if page == pages[1]:
     st.write("The DataFrame is constructed using the metadata provided by the IAM Handwriting Database and is linked to the paths of the corresponding images in the database.")
 
     # Creating four columns for different buttons to display data information
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         head_data = st.button("View DataFrame", key="df_head")
     with col2:
-        missing_values = st.button("Check Missing Values", key="df_na")
-    with col3:
         data_stat = st.button("View Summary Statistics", key="df_stat")
 
     # Handling button clicks to display relevant data
@@ -189,15 +196,6 @@ if page == pages[1]:
                 This DataFrame is constructed using the metadata provided by the IAM Handwriting Database, 
                 linking each word’s metadata to the path of the corresponding image in the dataset.
             """)
-
-    if missing_values:
-        st.write("### Missing Values in DataFrame")
-        missing_values_summary = df.isnull().sum()
-        st.write(missing_values_summary)
-        if missing_values_summary.sum() == 0:
-            st.write("The DataFrame has **no missing values**, indicating data completeness.")
-        else:
-            st.write("There are missing values in the dataset that need to be addressed.")
 
     if data_stat:
         st.write("### Summary Statistics of the DataFrame")
@@ -391,7 +389,7 @@ if page == pages[3]:
     """)    
     tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
-    def display_model_info(model_name, model_path, history_file, evaluation_metrics):
+    def display_model_info(model_name, model_path, history_file, Summary):
         st.subheader(f"{model_name}")
 
         # Adding buttons side by side using columns
@@ -460,7 +458,9 @@ if page == pages[3]:
             model_name="CNN Model",
             model_path=[path_to_checkpoints + 'CNN.png', path_to_checkpoints + 'naive_cnn_model_summary.png'],
             history_file=path_to_checkpoints + 'Naive_CNN_training_history.csv',
-            evaluation_metrics=[0.37, 0.45, 0.36]
+            Summary = [31, 0.41, 0.45, 0.37, 0.36,
+                       "\u2022 The CNN model struggles to generalize effectively, due to incufficient dataset samples ot Model architecture.",
+                       "\u2022 Training accuracy closely matches validation accuracy, suggesting potential underfitting, which indicates a lack of complexity to capture underlying data patterns."]
         )
 
     # LeNet Model Tab
@@ -469,7 +469,9 @@ if page == pages[3]:
             model_name="LeNet Model",
             model_path=[path_to_checkpoints + 'LeNet.png', path_to_checkpoints + 'lenet_model_summary.png'],
             history_file=path_to_checkpoints + 'LeNet_training_history.csv',
-            evaluation_metrics=[0.30, 0.34, 0.27]
+            Summary = [28, 0.42, 0.34, 0.30, 0.27,
+                       "\u2022 Similar to the CNN Model results the LeNet model struggles to generalize effectively.",
+                       "\u2022 The Zigzag pattern in validation accuracy suggests overfitting, which means the model fits noise in the training data rather than learning generalizable patterns."]
         )
 
     st.header("Customized Models on Filtered Data")
@@ -696,10 +698,10 @@ if page == pages[5]:
     # Future Directions
     st.header("Future Directions")
     st.write(
-        "- **Use grammatical labels** to improve class imbalance in the dataset, or/and **expand the training dataset** with domain-specific vocabulary."
+        "- **Enhance Dataset Quality**: Utilize **grammatical labels** to address class imbalance and **expand the dataset** with domain-specific vocabulary."
     )
     st.write(
-        "- **Fine-tune or add new techniques** to optimize the accuracy."
+        "- **Optimize Model Performance**: **Fine-tune existing models** and experiment with **model architecture alternatives** to enhance accuracy."
     )
     st.write(
         "- **Explore specialized pre-trained networks** on grayscale images for transfer training."
