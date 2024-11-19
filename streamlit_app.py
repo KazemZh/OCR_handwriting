@@ -84,9 +84,10 @@ def load_data():
 # Load the data
 df = load_data()
 
+
 # Streamlit sidebar navigation
 st.sidebar.title("Table of contents")
-pages = ["Introduction", "Exploration", "Data Visualization", "Modeling", "Testing", "Key Results and Findings"]
+pages = ["Introduction", "Exploration", "Data Visualization", "Modeling", "Try it Yourself", "Key Results and Findings"]
 page = st.sidebar.radio("Go to", pages)
 
 #Page0: Introduction
@@ -373,11 +374,21 @@ if page == pages[2]:
 # Page 3: Modeling
 if page == pages[3]:
     st.header("Pre-Trained Engines")
-    st.markdown("**PyTesseract**, **Doctr**, **EasyOCR**, and **Apache Tika** were tested on both **page-level** and **segmented word-level** handwritten text. Although these models are well-known for detecting printed text, they performed poorly with handwritten text, likely because they were not trained on datasets containing handwritten samples.")
-    st.markdown("Therefore, we decided to develop our own model and train it on handwritten data from IAM Handwriting Database.")
+    st.markdown("""
+    - Initially tested pre-trained OCR engines: **PyTesseract**, **Doctr**, **EasyOCR**, and **Apache Tika**.
+    - These engines are well-known for recognizing **printed text**, but they performed poorly with **handwritten text**.
+    - Tests conducted at both **page-level** and **segmented word-level** showed **high Word Error Rates (WER)**, close to **100%**.
+    - Multiple attempts to tune the engines' parameters did not significantly improve performance.
+    - For more details, please refer to the project report.
+    """)    
+    st.markdown("Therefore, we decided to develop our own model and train it on the handwritten data from IAM Handwriting Database.")
     st.header("Customized Models on Full Data")
-    st.write('In our initial approach, we trained both a simple **Convolutional Neural Network (CNN)** and a more complex **LeNet model** using all available word images that appeared at least twice in the dataset. In total, we utilized **108,128 images** for training and testing.')
-
+    st.markdown("""
+    - Initially trained a simple **Convolutional Neural Network (CNN)** as a basis for more complex models.
+    - **Tested LeNet model** after CNN.
+    - **Training data** consisted of all segmented words with **two or more samples**.
+    - Total dataset: **108,128 images** of **6,360 unique words**.
+    """)    
     tab1, tab2 = st.tabs(["CNN Model", "LeNet Model"])
     # Define a helper function to display content based on button clicks
     def display_model_info(model_name, model_path, history_file, evaluation_metrics):
@@ -398,7 +409,6 @@ if page == pages[3]:
             st.image(model_path[0], width=600)
             st.markdown("#### Model Summary")
             st.image(model_path[1], width=600)
-
         col1, col2 = st.columns(2)
         if show_accuracy:
             with col1:
@@ -425,22 +435,21 @@ if page == pages[3]:
                     st.write("**Validation Accuracy**= 0.45")
                     st.markdown(f"**Precision** = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
                     st.markdown(f"**F1-Score** = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)
-                    st.write("- The CNN model struggles to generalize effectively due to unbalanced samples in the dataset or model architecture.")
-                    st.write("- Training accuracy closely matches validation accuracy, suggesting potential underfitting, which indicates a lack of complexity to capture underlying data patterns.")
+                    st.write("- The CNN model struggles to generalize effectively, likely due to **imbalanced samples** in the dataset or **limitations in the  model architecture**.")
+                    st.write("- The training accuracy closely matches the validation accuracy, suggesting potential **underfitting**. This indicates that the model may lack sufficient complexity to capture the underlying data patterns effectively.")
                 elif model_name == 'LeNet Model':
                     st.write("**Early Stopping Epochs**= 28")
                     st.write("**Training Accuracy**= 0.42")
                     st.write("**Validation Accuracy**= 0.34")
                     st.markdown(f"**Precision** = <span>{evaluation_metrics[0]}</span>", unsafe_allow_html=True)
                     st.markdown(f"**F1-Score** = <span>{evaluation_metrics[2]}</span>", unsafe_allow_html=True)                    
-                    st.write("- Similar generalization problem to the CNN model appears consistently.")
-                    st.write("- Zigzag pattern in validation accuracy suggests overfitting, which is a sign of fitting the model to noises rather than learning generalizable patterns.")
+                    st.write("- A similar generalization issue, as observed in the CNN model, appears consistently.")
+                    st.write("- The zigzag pattern in validation accuracy suggests overfitting, indicating that the model may be fitting to noise rather than learning generalizable patterns.")
         if show_training:            
         # Customized Training Button
             st.write('After observing unsatisfactory prediction results, we implemented several optimization techniques to address data imbalance, including:')
             st.markdown('''
             - **Data Augmentation** using ImageDataGenerator
-            - **Callbacks**, specifically Early Stopping and Model Checkpoint
             - **Class Weights** based on word distribution
             ''')
             st.write('Despite these adjustments, we did not see any relevant improvement in model performance. Therefore we continued with the LeNet Model. ')
@@ -464,7 +473,14 @@ if page == pages[3]:
         )
 
     st.header("Customized Models on Filtered Data")
-    st.write('In our second approach, we retrained the optimized **CNN model** from the initial attempt and also implemented a **VGG16 model** using transfer learning. We manually balanced our dataset to enhance training efficacy and to investigate whether the issues were related to class imbalance or the model architecture itself. We focused on a balanced subset of the data that included words with between 100 and 200 occurrences, totaling **2679 images and 20 unique words**.')
+    st.markdown("""
+    In our second approach:
+
+    - We manually balanced the dataset to improve training efficacy by included words with samples between **100 and 200**.
+    - The total dataset consisted of **2,679 images of 20 unique words** after excluding stop words.
+    - We retrained the initial **CNN model** on the balanced dataset.
+    - Implemented **transfer learning using the VGG16 model** for further improvement.
+    """)
     tab1, tab2, tab3 = st.tabs(["Simple CNN Model", "VGG16 Frozen Model", "VGG16 Unfrozen Model"])
 
     # Define a helper function to display content based on button clicks
@@ -584,7 +600,7 @@ def process_image(image, model_type):
 
 # Page4: Testing
 if page == pages[4]:
-    st.title("Testing the models")
+    st.title("Try it Yourself")
     st.write("Upload an image of a handwritten word or draw directly on the canvas below and let a model you choose predict the word.")
     st.write("Available words for prediction: ['A', 'And', 'But', 'In', 'This', 'We', 'You', 'could', 'first', 'like', 'made', 'man', 'may', 'much', 'new', 'people', 'time', 'told', 'two', 'well']")
 
@@ -665,7 +681,7 @@ if page == pages[5]:
     # Conclusion
     st.header("Conclusion")
     st.write(
-        "- **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **50%**."
+        "- **Initial Attempts with Pre-trained Models**: Existing OCR tools were ineffective for handwritten text, with a **word error rate (WER)** of up to **100%** on the handwritten texts."
     )
     st.write(
         "- **Custom CNN and LeNet Models**: Developed custom CNN and LeNet models to improve accuracy but still faced issues with class imbalance."
@@ -686,5 +702,5 @@ if page == pages[5]:
         "- **Fine-tune or add new techniques** to optimize the accuracy."
     )
     st.write(
-        "- **Explore specialized pre-trained networks** for grayscale images."
+        "- **Explore specialized pre-trained networks** on grayscale images for transfer training."
     )
